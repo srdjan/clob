@@ -8,7 +8,7 @@ It accepts orders via a REST (or WebSocket API) and publishes updates on orderbo
 1) Start by cloning the repo locally and navigate to newly created folder:
 
 ```sh
-git clone https://github.com/srdjan/clob/.git   
+git clone https://github.com/srdjan/clob.git   
 cd clob
 ```
 

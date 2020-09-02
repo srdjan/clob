@@ -1,0 +1,19 @@
+{
+  "name": "clob",
+  "version": "1.0.0",
+  "description": "Central Limit Orderbook trading application",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srdjan/clob.git"
+  },
+  "author": "ss",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/srdjan/clob/issues"
+  },
+  "homepage": "https://github.com/srdjan/clob#readme"
+}
