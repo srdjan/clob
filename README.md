@@ -13,7 +13,7 @@ git clone https://github.com/srdjan/clob.git
 cd clob
 ```
 
-2)  Next, for API development and testing change directory to ./api and install dependencies and build the project:
+2)  Next, for API development change directory to ./api, install dependencies and build the project:
 
 ```sh
 cd api/
@@ -28,10 +28,12 @@ npm run test
 ```
 
 #### UI
+1)  For UI development change directory to ./ui, install dependencies and build the project:
+```
 [todo]
+```
 
 ### To tun the application, first start the services, and then the frontend (todo):
-
 ```
 //todo
 ```
