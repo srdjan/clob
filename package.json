@@ -4,6 +4,7 @@
   "description": "Central Limit Orderbook trading application",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon",
     "test": "test"
   },
   "repository": {
@@ -18,6 +19,8 @@
   "homepage": "https://github.com/srdjan/clob#readme",
   "devDependencies": {
     "@types/node": "^14.6.3",
+    "nodemon": "^2.0.4",
+    "ts-node": "^9.0.0",
     "typescript": "^4.0.2"
   }
 }
