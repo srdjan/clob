@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/srdjan/clob/issues"
   },
-  "homepage": "https://github.com/srdjan/clob#readme"
+  "homepage": "https://github.com/srdjan/clob#readme",
+  "devDependencies": {
+    "@types/node": "^14.6.3",
+    "typescript": "^4.0.2"
+  }
 }
