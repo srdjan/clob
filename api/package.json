@@ -1,7 +1,7 @@
 {
   "name": "@clob/api",
   "version": "1.0.0",
-  "description": "Central Limit Orderbook trading application API services",
+  "description": "APIs for Central Limit Orderbook trading application",
   "main": "index.js",
   "type": "module",
   "scripts": {
