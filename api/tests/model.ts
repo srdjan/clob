@@ -1,5 +1,5 @@
 import { uuid } from 'uuidv4'
-import {Trader, Order, Trade } from '../src/domain/model'
+import {Trader, Order, Trade } from '../src/model'
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 
