@@ -27,7 +27,7 @@ const add = (orderBook: OrderBook, order: Order): Trade | Error => {
   }
 
   orderBook.orders.push(order)
-  let result = match(orderBook)
+  let result = match(orderBook) //todo: extract into separate file
   return result
 }
 

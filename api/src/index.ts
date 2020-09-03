@@ -1,12 +1,40 @@
-import { Ticker, Trader, Order, Trade } from './model'
-import {OrderBook, create, add} from './orderbook'
+import { Ticker, Trader, Order, Money, Quantity, Trade } from './model'
+import { OrderBook, create, add } from './orderbook'
 
-export {
-  Ticker, 
-  Trader,
-  Order,
-  Trade,
-  OrderBook,
-  create,
-  add
+const Buy = (
+  trader: Trader,
+  ticker: Ticker,
+  price: Money,
+  quantity: Quantity
+): Order | Error => {
+  return new Error('BUY Not Implemented!')
 }
+
+const Sell = (
+  trader: Trader,
+  ticker: Ticker,
+  price: Money,
+  quantity: Quantity
+): Order | Error => {
+  return new Error('SELL Not Implemented!')
+}
+
+const Cancel = (
+  trader: Trader,
+  ticker: Ticker,
+  price: Money,
+  quantity: Quantity
+): Order | Error => {
+  return new Error('CANCEL Not Implemented!')
+}
+
+const Show = (
+  trader: Trader,
+  ticker: Ticker,
+  price: Money,
+  quantity: Quantity
+): Order | Error => {
+  return new Error('SHOW Not Implemented!')
+}
+
+export default { Buy, Sell, Cancel, Show }
