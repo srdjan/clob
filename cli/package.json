@@ -1,0 +1,25 @@
+{
+	"name": "clob",
+	"version": "1.0.0",
+	"description": "Command line interface for Central Limit Orderbook trading application",
+	"license": "ISC",
+	"main": "index.js",
+	"bin": "./build/cli.js",
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"dev": "pastel dev",
+		"build": "pastel build",
+		"prepare": "pastel build"
+	},
+	"files": [
+		"build"
+	],
+	"dependencies": {
+		"ink": "^2.1.5",
+		"pastel": "^1.1.1",
+		"prop-types": "^15.7.2",
+		"react": "^16.13.1"
+	}
+}
