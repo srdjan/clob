@@ -30,8 +30,26 @@
 				}
 			],
 			"isIndex": false,
-			"name": "sell",
-			"path": "sell/index.js",
+			"name": "buy",
+			"path": "buy/index.js",
+			"subCommands": []
+		},
+		{
+			"description": "",
+			"positionalArgs": [],
+			"args": [
+				{
+					"key": "name",
+					"type": "string",
+					"description": "",
+					"isRequired": true,
+					"aliases": [],
+					"positional": false
+				}
+			],
+			"isIndex": true,
+			"name": "*",
+			"path": "index.js",
 			"subCommands": []
 		},
 		{
@@ -64,26 +82,8 @@
 				}
 			],
 			"isIndex": false,
-			"name": "buy",
-			"path": "buy/index.js",
-			"subCommands": []
-		},
-		{
-			"description": "",
-			"positionalArgs": [],
-			"args": [
-				{
-					"key": "name",
-					"type": "string",
-					"description": "",
-					"isRequired": true,
-					"aliases": [],
-					"positional": false
-				}
-			],
-			"isIndex": true,
-			"name": "*",
-			"path": "index.js",
+			"name": "sell",
+			"path": "sell/index.js",
 			"subCommands": []
 		}
 	]

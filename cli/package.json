@@ -1,12 +1,14 @@
 {
-	"name": "clob",
+	"name": "@clob/cli",
 	"version": "1.0.0",
 	"description": "Command line interface for Central Limit Orderbook trading application",
 	"license": "ISC",
 	"main": "index.js",
-	"bin": "./build/cli.js",
+	"bin": {
+		"clob": "./build/cli.js"
+	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=14"
 	},
 	"scripts": {
 		"dev": "pastel dev",
