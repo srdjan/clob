@@ -5,7 +5,7 @@ It accepts orders via a REST (or WebSocket API) and publishes updates on orderbo
 
 ### Installation
 
-#### API
+## API
 1) Start by cloning the repo locally and navigate to newly created folder:
 
 ```sh
@@ -27,13 +27,33 @@ npm run build
 npm run test
 ```
 
-#### UI
-1)  For UI development change directory to ./ui, install dependencies and build the project:
+## CLI
+```
+$ cli --help
+cli
+
+clob command ...otions
+
+Commands:
+  'buy' 
+  'sell'
+  'cancel'
+  'show'
+
+Options:
+  --name      Name of the trader           [string]
+  --ticker    Ticker symbol                [string]
+  --quantity  Number of shares             [string]
+  
+```
+
+## UI
+For UI development change directory to ./ui, install dependencies and build the project:
 ```
 [todo]
 ```
 
-### To tun the application, first start the services, and then the frontend (todo):
+### To run the application, first start the services, and then the frontend (todo):
 ```
 //todo
 ```

@@ -1,0 +1,90 @@
+{
+	"commands": [
+		{
+			"description": "",
+			"positionalArgs": [],
+			"args": [
+				{
+					"key": "name",
+					"type": "string",
+					"description": "",
+					"isRequired": true,
+					"aliases": [],
+					"positional": false
+				},
+				{
+					"key": "ticker",
+					"type": "string",
+					"description": "",
+					"isRequired": true,
+					"aliases": [],
+					"positional": false
+				},
+				{
+					"key": "quantity",
+					"type": "number",
+					"description": "",
+					"isRequired": true,
+					"aliases": [],
+					"positional": false
+				}
+			],
+			"isIndex": false,
+			"name": "buy",
+			"path": "buy/index.js",
+			"subCommands": []
+		},
+		{
+			"description": "",
+			"positionalArgs": [],
+			"args": [
+				{
+					"key": "name",
+					"type": "string",
+					"description": "",
+					"isRequired": true,
+					"aliases": [],
+					"positional": false
+				}
+			],
+			"isIndex": true,
+			"name": "*",
+			"path": "index.js",
+			"subCommands": []
+		},
+		{
+			"description": "",
+			"positionalArgs": [],
+			"args": [
+				{
+					"key": "name",
+					"type": "string",
+					"description": "",
+					"isRequired": true,
+					"aliases": [],
+					"positional": false
+				},
+				{
+					"key": "ticker",
+					"type": "string",
+					"description": "",
+					"isRequired": true,
+					"aliases": [],
+					"positional": false
+				},
+				{
+					"key": "quantity",
+					"type": "number",
+					"description": "",
+					"isRequired": true,
+					"aliases": [],
+					"positional": false
+				}
+			],
+			"isIndex": false,
+			"name": "sell",
+			"path": "sell/index.js",
+			"subCommands": []
+		}
+	]
+}

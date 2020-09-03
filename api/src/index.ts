@@ -1,3 +1,12 @@
-const sum = (a : number, b: number) : number => a + b
+import { Ticker, Trader, Order, Trade } from './model'
+import {OrderBook, create, add} from './orderbook'
 
-export default sum
+export {
+  Ticker, 
+  Trader,
+  Order,
+  Trade,
+  OrderBook,
+  create,
+  add
+}
