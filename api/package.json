@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc ./src/index.ts --outDir dist/ --module ES2020",
-    "test": "node -r esm ./tests/model.ts"
+    "test": "ts-node -r esm ./tests/model.ts"
   },
   "devDependencies": {
     "@types/node": "^14.6.3",

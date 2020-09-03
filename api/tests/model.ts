@@ -14,7 +14,7 @@ test('Trader', () => {
 
   const output = JSON.stringify(trader)
 
-  assert.snapshot(output, `{"username":"traderjoe","password":"pswrd", "balance":"44400009"`)
+  assert.snapshot(output, `{"username":"traderjoe","password":"pswrd","balance":44400009}`)
   assert.equal(JSON.parse(output), trader, 'matches original')
 })
 
