@@ -1,5 +1,5 @@
 import { Ticker, Trader, Order, Money, Quantity, Trade } from './model'
-import { OrderBook, create, add } from './orderbook'
+import { OrderBook, create, add, cancel } from './orderbook'
 
 const Buy = (
   trader: Trader,

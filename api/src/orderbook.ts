@@ -17,7 +17,6 @@ const create = (ticker: Ticker) => {
 }
 
 const match = (orderBook: OrderBook): Trade | Error => {
-  //todo
   return new Error('Not Implemented!')
 }
 
@@ -26,9 +25,13 @@ const add = (orderBook: OrderBook, order: Order): Trade | Error => {
     return new Error('Fail: OrderBook has to match Order ticker')
   }
 
-  orderBook.orders.push(order)
-  let result = match(orderBook) //todo: extract into separate file
+  orderBook.orders.push(order)  //todo: replace array with sortable, efficient data structure
+  let result = match(orderBook) //todo: raise event (?), extract matcher into separate file
   return result
 }
 
-export { OrderBook, create, add }
+const cancel = (orderBook: OrderBook, order: Order): true | Error => {
+  return new Error('Not Implemented!')
+}
+
+export { OrderBook, create, add, cancel }
