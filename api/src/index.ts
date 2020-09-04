@@ -1,5 +1,5 @@
 import { Order } from './model'
-import * as OrderBook from './orderbook'
+import * as OrderBook from './orderbooks'
 
 const Buy = (
   username: string,

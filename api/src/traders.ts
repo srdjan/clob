@@ -5,6 +5,17 @@ type Trader = {
   balance: Money
 }
 
-type Traders = Map<string, Trader>
+const traders = new Map<string, Trader>()
 
-export {Trader, Traders}
+const getTrader = (userName: string): Trader => {
+  if (traders.has(userName)) {
+    console.log('Trader not registered')
+    return traders.get(userName) as Trader
+  } 
+  
+  let trader: Trader = { username: userName, balance: 0 }
+  traders.set(trader.username, trader)
+  return trader
+}
+
+export {Trader, getTrader}

@@ -1,7 +1,7 @@
 import { uuid } from 'uuidv4'
 import { Order } from '../src/model'
 import { Trader } from '../src/traders'
-import * as Clob from '../src/orderbook'
+import * as Clob from '../src/orderbooks'
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 
@@ -104,10 +104,12 @@ test('Trade', () => {
   assert.equal(trade.quantity, buyOrder.filledQuantity)
 })
 
-test('Add Order', () => {
+test('Add Order, create trader acct', () => {
   let order = Clob.add('traderjoe', 'Buy', 'TW', 1999, 100)
   assert.equal(order.trader?.username, 'traderjoe')
   assert.equal(order.quantity, 100)
 })
 
 test.run()
+
+

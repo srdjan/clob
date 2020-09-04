@@ -5,10 +5,8 @@ import {
   Side,
   Trade
 } from './model'
-import { Trader } from './traders'
+import { getTrader } from './traders'
 import { Result } from './utils'
-
-const traders = new Map<string, Trader>()
 
 type OrderBook = {
   buyOrders: Order[] //todo: just a placeholder, more appropriate data structure required
@@ -38,22 +36,6 @@ const execute = (orderBook: OrderBook): Result<Trade> => {
     outcome: false,
     message: 'Not implemented yet'
   }
-}
-
-let getTrader: (userName: string) => Trader = 
-  function (userName: string): Trader {
-  let trader: Trader = { username: userName, balance: 0 }
-  if (!traders.has(userName)) {
-    console.log('Trader not registered')
-    traders.set(userName, trader)
-  } else {
-    let result = traders.get(userName)
-    if(!result) {
-      throw new Error('Unexpected !!!')
-    }
-    trader.balance = result.balance
-  }
-  return trader
 }
 
 const add = (userName: string, side: Side, ticker: Ticker, limit: number, quantity: number): Order => {
