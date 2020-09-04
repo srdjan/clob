@@ -35,4 +35,4 @@ type Trade = {
  createdAt: Datetime
 }
 
-export {Money, Quantity, Ticker, Trader, Order, Trade}
+export {Money, Quantity, Ticker, Side, Trader, Order, Trade}

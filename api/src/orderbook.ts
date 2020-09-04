@@ -18,7 +18,7 @@ const create = (ticker: Ticker) => {
   }
 }
 
-const match = (orderBook: OrderBook): Trade | Error => {
+const execute = (orderBook: OrderBook): Trade | Error => {
   return new Error('Not Implemented!')
 }
 
@@ -27,8 +27,10 @@ const add = (orderBook: OrderBook, order: Order): Trade | Error => {
     return new Error('Fail: OrderBook has to match Order ticker')
   }
 
-  orderBook.orders.push(order)  //todo: replace array with sortable, efficient data structure
-  let result = match(orderBook) //todo: raise event (?), extract matcher into separate file
+  if(order.side === 'Buy') orderBook.buyOrders.push(order)  //todo: replace array with better data structure
+  if(order.side === 'Sell') orderBook.sellOrders.push(order)  //todo: replace array with better data structure
+  
+  let result = execute(orderBook) //todo: raise event (?), extract executor into separate file?
   return result
 }
 
