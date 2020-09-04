@@ -1,8 +1,6 @@
-import {Money} from './utils'
-
 type Trader = {
   username: string
-  balance: Money
+  password?: string
 }
 
 const traders = new Map<string, Trader>()
@@ -13,7 +11,7 @@ const getTrader = (userName: string): Trader => {
     return traders.get(userName) as Trader
   } 
   
-  let trader: Trader = { username: userName, balance: 0 }
+  let trader: Trader = { username: userName, password: 'todo' }
   traders.set(trader.username, trader)
   return trader
 }

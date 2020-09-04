@@ -1,6 +1,4 @@
-import { uuid } from 'uuidv4'
-import { Order } from '../src/model'
-import { Trader } from '../src/traders'
+import { id } from '../src/utils'
 import * as Clob from '../src/orderbooks'
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
@@ -25,7 +23,7 @@ test('Order', () => {
     balance: 44400009
   }
   const buyOrder = {
-    id: uuid(),
+    id: id(),
     trader: trader,
     ticker: 'TW',
     side: 'Buy',
@@ -46,7 +44,7 @@ test('Order', () => {
     balance: 44400009
   }
   const buyOrder = {
-    id: uuid(),
+    id: id(),
     trader: trader,
     ticker: 'TW',
     side: 'Buy',
@@ -67,7 +65,7 @@ test('Trade', () => {
     balance: 1400022
   }
   const buyOrder = {
-    id: uuid(),
+    id: id(),
     trader: trader,
     ticker: 'TW',
     side: 'Buy',
@@ -78,7 +76,7 @@ test('Trade', () => {
     createdAt: new Date().getTime()
   }
   const sellOrder = {
-    id: uuid(),
+    id: id(),
     trader: trader,
     ticker: 'TW',
     side: 'Sell',

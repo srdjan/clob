@@ -1,8 +1,5 @@
-import { uuid } from "uuidv4"
-import { Ticker } from "./model"
-
+import { uuid as id } from 'uuidv4'
 type Money = number //todo: in cents, but will require higher precision
-const Decimals = 2 //todo: in cents, but will require higher precision
 
 type Result<T> = {
   outcome: boolean
@@ -12,4 +9,4 @@ type Result<T> = {
 
 type Uuid = string
 
-export { Money, Decimals, Result, Uuid } 
+export { Money, Result, Uuid, id } 

@@ -1,4 +1,3 @@
-import { uuid } from 'uuidv4'
 import {
   Ticker,
   Order,
@@ -6,7 +5,7 @@ import {
   Trade
 } from './model'
 import { getTrader } from './traders'
-import { Result } from './utils'
+import { Result, id } from './utils'
 
 type OrderBook = {
   buyOrders: Order[] //todo: just a placeholder, more appropriate data structure required
@@ -49,7 +48,7 @@ const add = (userName: string, side: Side, ticker: Ticker, limit: number, quanti
 
   // create order
   let order: Order = {
-    id: uuid(),
+    id: id(),
     trader: trader,
     ticker: ticker,
     side: side,

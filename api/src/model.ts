@@ -1,4 +1,4 @@
-import { Money, Uuid} from './utils'
+import { Uuid, Money } from './utils'
 import {Trader} from './traders'
 
 type Ticker = 'TW' | 'NET' | 'T' 
