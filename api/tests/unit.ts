@@ -1,30 +1,30 @@
 import { uuid } from 'uuidv4'
-import {Trader, Order, Trade } from '../src/model'
+import { Order } from '../src/model'
+import { Trader } from '../src/traders'
+import * as Clob from '../src/orderbook'
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 
 const test = suite('test')
 
 test('Trader', () => {
-  const trader: Trader = {
+  const trader = {
     username: 'traderjoe',
-    password: 'pswrd',
     balance: 44400009
   }
 
   const output = JSON.stringify(trader)
 
-  assert.snapshot(output, `{"username":"traderjoe","password":"pswrd","balance":44400009}`)
+  assert.snapshot(output, `{"username":"traderjoe","balance":44400009}`)
   assert.equal(JSON.parse(output), trader, 'matches original')
 })
 
 test('Order', () => {
-  const trader: Trader = {
+  const trader = {
     username: 'traderjoe',
-    password: 'pswrd',
     balance: 44400009
   }
-  const buyOrder: Order = {
+  const buyOrder = {
     id: uuid(),
     trader: trader,
     ticker: 'TW',
@@ -37,16 +37,15 @@ test('Order', () => {
   }
 
   assert.not.equal(buyOrder.ticker, 'ATT')
-  assert.equal(buyOrder.trader.password, 'pswrd')
+  assert.equal(buyOrder.trader.username, 'traderjoe')
 })
 
 test('Order', () => {
-  const trader: Trader = {
+  const trader = {
     username: 'traderjoe',
-    password: 'pswrd',
     balance: 44400009
   }
-  const buyOrder: Order = {
+  const buyOrder = {
     id: uuid(),
     trader: trader,
     ticker: 'TW',
@@ -63,12 +62,11 @@ test('Order', () => {
 })
 
 test('Trade', () => {
-  const trader: Trader = {
+  const trader = {
     username: 'tradersam',
-    password: 'pswrd',
     balance: 1400022
   }
-  const buyOrder: Order = {
+  const buyOrder = {
     id: uuid(),
     trader: trader,
     ticker: 'TW',
@@ -79,7 +77,7 @@ test('Trade', () => {
     status: 'Completed',
     createdAt: new Date().getTime()
   }
-  const sellOrder: Order = {
+  const sellOrder = {
     id: uuid(),
     trader: trader,
     ticker: 'TW',
@@ -91,7 +89,7 @@ test('Trade', () => {
     createdAt: new Date().getTime()
   }
 
-  const trade: Trade = {
+  const trade = {
     ticker: buyOrder.ticker,
     price: buyOrder.limit,
     quantity: 20,
@@ -104,6 +102,12 @@ test('Trade', () => {
   assert.equal(trade.sellOrder.status, 'Open')
   assert.equal(trade.ticker, 'TW')
   assert.equal(trade.quantity, buyOrder.filledQuantity)
+})
+
+test('Add Order', () => {
+  let order = Clob.add('traderjoe', 'Buy', 'TW', 1999, 100)
+  assert.equal(order.trader?.username, 'traderjoe')
+  assert.equal(order.quantity, 100)
 })
 
 test.run()

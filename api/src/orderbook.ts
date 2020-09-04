@@ -1,41 +1,118 @@
+import { uuid } from 'uuidv4'
 import {
   Ticker,
   Order,
+  Side,
   Trade
 } from './model'
+import { Trader } from './traders'
+import { Result } from './utils'
+
+const traders = new Map<string, Trader>()
 
 type OrderBook = {
-  ticker: Ticker
   buyOrders: Order[] //todo: just a placeholder, more appropriate data structure required
   sellOrders: Order[] //todo: just a placeholder, more appropriate data structure required
 }
+const orderBooks = new Map<Ticker, OrderBook>()
 
-const create = (ticker: Ticker) => {
-  return {
-    ticker: ticker,
+const create = (ticker: Ticker): OrderBook => {
+  if (orderBooks.has(ticker)) {
+    return orderBooks.get(ticker) as OrderBook
+  }
+
+  let orderBook = {
     buyOrders: new Array<Order>(),
     sellOrders: new Array<Order>()
   }
+  orderBooks.set(ticker, orderBook)
+  return orderBook
 }
 
-const execute = (orderBook: OrderBook): Trade | Error => {
-  return new Error('Not Implemented!')
+const execute = (orderBook: OrderBook): Result<Trade> => {
+  //todo: 
+  // match prices
+  // execute trade
+  // log trade
+  return {
+    outcome: false,
+    message: 'Not implemented yet'
+  }
 }
 
-const add = (orderBook: OrderBook, order: Order): Trade | Error => {
-  if (orderBook.ticker !== order.ticker) {
-    return new Error('Fail: OrderBook has to match Order ticker')
+let getTrader: (userName: string) => Trader = 
+  function (userName: string): Trader {
+  let trader: Trader = { username: userName, balance: 0 }
+  if (!traders.has(userName)) {
+    console.log('Trader not registered')
+    traders.set(userName, trader)
+  } else {
+    let result = traders.get(userName)
+    if(!result) {
+      throw new Error('Unexpected !!!')
+    }
+    trader.balance = result.balance
+  }
+  return trader
+}
+
+const add = (userName: string, side: Side, ticker: Ticker, limit: number, quantity: number): Order => {
+  let trader = getTrader(userName)
+
+  // check if the orderbook for requested ticker exist, and create if not
+  let orderBook = orderBooks.get(ticker)
+  if (!orderBook) {
+    orderBook = create(ticker)
   }
 
+  // create order
+  let order: Order = {
+    id: uuid(),
+    trader: trader,
+    ticker: ticker,
+    side: side,
+    limit: limit,
+    quantity: quantity,
+    filledQuantity: 0,
+    status: 'Open',
+    createdAt: new Date().getTime()
+  }
+
+  // persist the order
   if(order.side === 'Buy') orderBook.buyOrders.push(order)  //todo: replace array with better data structure
   if(order.side === 'Sell') orderBook.sellOrders.push(order)  //todo: replace array with better data structure
   
-  let result = execute(orderBook) //todo: raise event (?), extract executor into separate file?
+  // find if there are matching orders to execute
+  let result = execute(orderBook) //todo: extract executor into separate file?
+  if (!result.outcome) {
+    return order
+  }
+  if(result && result.data && result.data.quantity < quantity) {
+    order.status = 'Open'
+    order.filledQuantity = quantity - result.data.quantity
+  }
+  else if (result && result.data && result.data.quantity === quantity) {
+    order.status = 'Completed'
+    order.filledQuantity = quantity
+  }
+  else {
+    throw new Error('Invalid state after trade execution')
+  }
+  return order
+}
+
+const cancel = (order: Order): boolean => {
+  let orderBook = orderBooks.get(order.ticker)
+  if (!orderBook) {
+    //todo: add logging
+    return true
+  }
+
+  let result = orderBooks.delete(order.ticker)
+  if(!result) {
+    //todo: add logging
+  }
   return result
 }
 
-const cancel = (orderBook: OrderBook, order: Order): true | Error => {
-  return new Error('Not Implemented!')
-}
-
-export { OrderBook, create, add, cancel }
+export { add, cancel }

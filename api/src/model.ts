@@ -1,29 +1,22 @@
-type Money = number //todo: in cents, but will require higher precision
-const decimals = 2  //todo: in cents, but will require higher precision
+import { Money, Uuid} from './utils'
+import {Trader} from './traders'
 
-type Uuid = string
 type Ticker = 'TW' | 'NET' | 'T' 
 type Quantity = number
 type Side = 'Buy' | 'Sell'
 type Status = 'Open' | 'Completed' | 'Canceled'
 type Datetime = number    // milliseconds
 
-type Trader = {
-  username: string
-  password: string
-  balance: Money
-}
-
 type Order = {
   id: Uuid
-  trader: Trader
+  trader?: Trader //todo: Map.get returns T | undefined, this is temporary solution, FIX IT!
   ticker: Ticker 
   side: Side
   limit: Money  
   quantity: Quantity
-  filledQuantity: Quantity
-  status: Status
-  createdAt: Datetime
+  filledQuantity?: Quantity
+  status?: Status
+  createdAt?: Datetime
 }
 
 type Trade = {
@@ -32,7 +25,8 @@ type Trade = {
  quantity: Quantity
  buyOrder: Order
  sellOrder: Order
- createdAt: Datetime
+ createdAt: Datetime,
+ message: string
 }
 
-export {Money, Quantity, Ticker, Side, Trader, Order, Trade}
+export {Money, Quantity, Ticker, Side, Order, Trade}
