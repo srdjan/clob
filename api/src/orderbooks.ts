@@ -5,7 +5,7 @@ import {
   Trade
 } from './model'
 import { getTrader } from './traders'
-import { Result, id } from './utils'
+import { Result, id, log } from './utils'
 
 type OrderBook = {
   buyOrders: Order[] //todo: just a placeholder, more appropriate data structure required
@@ -82,11 +82,14 @@ const add = (userName: string, side: Side, ticker: Ticker, limit: number, quanti
   return order
 }
 
-const cancel = (order: Order): boolean => {
-  let orderBook = orderBooks.get(order.ticker)
+const cancel = (ticker: Ticker, id: string): Result<{}> => {
+  let orderBook = orderBooks.get(ticker)
   if (!orderBook) {
-    //todo: add logging
-    return true
+    log(`Orderbooks: Invalid request, OrderBook for ${ticker} not found`)
+    return {
+      outcome: false,
+      message: 'Not implemented yet'
+    }
   }
 
   let result = orderBooks.delete(order.ticker)

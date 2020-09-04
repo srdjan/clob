@@ -9,4 +9,6 @@ type Result<T> = {
 
 type Uuid = string
 
-export { Money, Result, Uuid, id } 
+const log = console.log //todo: replace with real logger after v0.1
+
+export { Money, Result, Uuid, id, log } 
