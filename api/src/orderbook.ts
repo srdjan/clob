@@ -6,13 +6,15 @@ import {
 
 type OrderBook = {
   ticker: Ticker
-  orders: Order[] //todo: just a placeholder, more appropriate data structure required
+  buyOrders: Order[] //todo: just a placeholder, more appropriate data structure required
+  sellOrders: Order[] //todo: just a placeholder, more appropriate data structure required
 }
 
 const create = (ticker: Ticker) => {
   return {
     ticker: ticker,
-    orders: []
+    buyOrders: new Array<Order>(),
+    sellOrders: new Array<Order>()
   }
 }
 

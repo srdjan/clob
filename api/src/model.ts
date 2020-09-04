@@ -1,11 +1,10 @@
-type Money = number // cents, but will require higher precision
-const decimals = 2
+type Money = number //todo: in cents, but will require higher precision
+const decimals = 2  //todo: in cents, but will require higher precision
 
 type Uuid = string
 type Ticker = 'TW' | 'NET' | 'T' 
 type Quantity = number
-type Buy = 'Buy'
-type Sell = 'Sell'
+type Side = 'Buy' | 'Sell'
 type Status = 'Open' | 'Completed' | 'Canceled'
 type Datetime = number    // milliseconds
 
@@ -19,24 +18,21 @@ type Order = {
   id: Uuid
   trader: Trader
   ticker: Ticker 
-  side: Buy | Sell
+  side: Side
   limit: Money  
   quantity: Quantity
   filledQuantity: Quantity
   status: Status
   createdAt: Datetime
 }
-type BuyOrder = Order & {side: Buy}
-type SellOrder = Order & {side: Sell}
 
-type CompletedTrade = {
+type Trade = {
  ticker: Ticker 
  price: Money
  quantity: Quantity
- order: BuyOrder | SellOrder
+ buyOrder: Order
+ sellOrder: Order
  createdAt: Datetime
 }
-type NoTrade = { message: 'No match, No trade '}
-type Trade = CompletedTrade | NoTrade
 
 export {Money, Quantity, Ticker, Trader, Order, Trade}
