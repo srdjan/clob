@@ -8,8 +8,8 @@ import * as Traders from './traders'
 import { Result, Uid, getUid, log } from './utils'
 
 type OrderBook = {
-  buyOrders: Map<Uid, Order> //todo: just a placeholder, more appropriate data structure required
-  sellOrders: Map<Uid, Order> //todo: just a placeholder, more appropriate data structure required
+  buyOrders: Map<Uid, Order>
+  sellOrders: Map<Uid, Order> 
 }
 const orderBooks = new Map<Ticker, OrderBook>()
 
@@ -19,8 +19,8 @@ const create = (ticker: Ticker): OrderBook => {
   }
 
   let orderBook = {
-    buyOrders: new Map<Uid, Order>(),
-    sellOrders: new Map<Uid, Order>()
+    buyOrders: new Map<Uid, Order>(),//todo: just a placeholder, more appropriate data structure required
+    sellOrders: new Map<Uid, Order>()//todo: just a placeholder, more appropriate data structure required
   }
   orderBooks.set(ticker, orderBook)
   return orderBook
