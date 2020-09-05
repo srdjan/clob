@@ -5,12 +5,12 @@ import Clob from '../src/index'
 const test = suite('test')
 
 test('Buy', () => {
-  let response = Clob.Buy('traderjoe', 'TW', 10000, 10 )
+  let response = Clob.Buy('traderjoe', 'TW', 10000, 10)
   let result = JSON.parse(response)
   assert.equal(result.outcome, undefined)
-  
+
   let order = JSON.parse(response)
-  assert.equal(order.ticker, 'TW') 
+  assert.equal(order.ticker, 'TW')
 })
 
 test('Sell', () => {

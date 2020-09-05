@@ -8,13 +8,15 @@ type Trader = {
 
 const traders = new Map<string, Trader>()
 
-function get(userName: string, side: Side): Trader {
+function get (userName: string, side: Side): Trader {
   if (traders.has(userName)) {
     return traders.get(userName) as Trader
   }
-  
-  if(side !== 'Buy') {
-    throw new Error(`Traders: invalid request to cancel sell order for non-existing account`)
+
+  if (side !== 'Buy') {
+    throw new Error(
+      `Traders: invalid request to cancel sell order for non-existing account`
+    )
   }
 
   log(`Traders: trader's first bid, auto registering ${userName}`)
@@ -32,4 +34,4 @@ function verify (userName: string): boolean {
   return true
 }
 
-export {Trader, get, verify }
+export { Trader, get, verify }

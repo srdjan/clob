@@ -1,15 +1,10 @@
-import {
-  Ticker,
-  Order,
-  Side,
-  Trade
-} from './model'
+import { Ticker, Order, Side, Trade } from './model'
 import * as Traders from './traders'
 import { Result, Uid, getUid, log } from './utils'
 
 type OrderBook = {
   buyOrders: Map<Uid, Order>
-  sellOrders: Map<Uid, Order> 
+  sellOrders: Map<Uid, Order>
 }
 const orderBooks = new Map<Ticker, OrderBook>()
 
@@ -19,15 +14,15 @@ const create = (ticker: Ticker): OrderBook => {
   }
 
   let orderBook = {
-    buyOrders: new Map<Uid, Order>(),//todo: just a placeholder, more appropriate data structure required
-    sellOrders: new Map<Uid, Order>()//todo: just a placeholder, more appropriate data structure required
+    buyOrders: new Map<Uid, Order>(), //todo: just a placeholder, more appropriate data structure required
+    sellOrders: new Map<Uid, Order>() //todo: just a placeholder, more appropriate data structure required
   }
   orderBooks.set(ticker, orderBook)
   return orderBook
 }
 
 const match = (orderBook: OrderBook): Result<Trade> => {
-  //todo: 
+  //todo:
   // match prices
   // execute trade
   // log trade
@@ -37,7 +32,13 @@ const match = (orderBook: OrderBook): Result<Trade> => {
   }
 }
 
-const bid = (userName: string, side: Side, ticker: Ticker, limit: number, quantity: number): Order => {
+const bid = (
+  userName: string,
+  side: Side,
+  ticker: Ticker,
+  limit: number,
+  quantity: number
+): Order => {
   let trader = Traders.get(userName, side)
 
   // check if the orderbook for requested ticker exist, and create if not
@@ -60,30 +61,33 @@ const bid = (userName: string, side: Side, ticker: Ticker, limit: number, quanti
   }
 
   // persist the order
-  if(order.side === 'Buy') orderBook.buyOrders.set(ticker, order)  
-  if(order.side === 'Sell') orderBook.sellOrders.set(ticker, order)  
-  
+  if (order.side === 'Buy') orderBook.buyOrders.set(ticker, order)
+  if (order.side === 'Sell') orderBook.sellOrders.set(ticker, order)
+
   // find if there are matching orders to execute
   let result = match(orderBook) //todo: extract executor into separate file?
   if (!result.outcome) {
     return order
   }
 
-  if(result && result.data && result.data.quantity < quantity) {
+  if (result && result.data && result.data.quantity < quantity) {
     order.status = 'Open'
     order.filledQuantity = quantity - result.data.quantity
-  }
-  else if (result && result.data && result.data.quantity === quantity) {
+  } else if (result && result.data && result.data.quantity === quantity) {
     order.status = 'Completed'
     order.filledQuantity = quantity
-  }
-  else {
+  } else {
     throw new Error(`Orderbooks: Invalid state after trade execution`)
   }
   return order
 }
 
-const cancel = (userName: string, id: Uid, ticker: Ticker, side: Side): boolean => {
+const cancel = (
+  userName: string,
+  id: Uid,
+  ticker: Ticker,
+  side: Side
+): boolean => {
   Traders.verify(userName)
 
   let orderBook = orderBooks.get(ticker)
@@ -95,19 +99,17 @@ const cancel = (userName: string, id: Uid, ticker: Ticker, side: Side): boolean 
   let order: Order
   if (side === 'Buy') {
     order = orderBook.buyOrders.get(id) as Order
-    if(order.status === 'Open' || order.status === 'Partial') {
+    if (order.status === 'Open' || order.status === 'Partial') {
       order.status = 'Canceled'
       orderBook.buyOrders.set(id, order)
     }
-  }
-  else if (side === 'Sell') {
+  } else if (side === 'Sell') {
     order = orderBook.sellOrders.get(id) as Order
-    if(order.status === 'Open' || order.status === 'Partial') {
+    if (order.status === 'Open' || order.status === 'Partial') {
       order.status = 'Canceled'
       orderBook.sellOrders.set(id, order)
     }
-  }
-  else {
+  } else {
     throw new Error(`Orderbooks: Invalid request, OrderBook ${side} incorrect`)
   }
 
