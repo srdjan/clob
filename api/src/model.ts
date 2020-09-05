@@ -29,4 +29,4 @@ type Trade = {
  message: string
 }
 
-export {Money, Quantity, Ticker, Side, Order, Trade}
+export { Ticker, Side, Order, Trade }
