@@ -1,14 +1,14 @@
-import { Uuid, Money } from './utils'
+import { Uid, Money } from './utils'
 import {Trader} from './traders'
 
 type Ticker = 'TW' | 'NET' | 'T' 
 type Quantity = number
 type Side = 'Buy' | 'Sell'
-type Status = 'Open' | 'Completed' | 'Canceled'
+type Status = 'Open' | 'Partial' | 'Completed' | 'Canceled'
 type Datetime = number    // milliseconds
 
 type Order = {
-  id: Uuid
+  id: Uid
   trader?: Trader //todo: Map.get returns T | undefined, this is temporary solution, FIX IT!
   ticker: Ticker 
   side: Side

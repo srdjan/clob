@@ -1,5 +1,5 @@
-import { id } from '../src/utils'
-import * as Clob from '../src/orderbooks'
+import { getUid } from '../src/utils'
+import { bid, cancel } from '../src/orderbooks'
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 
@@ -10,20 +10,19 @@ test('Trader', () => {
     username: 'traderjoe',
     balance: 44400009
   }
-
   const output = JSON.stringify(trader)
 
   assert.snapshot(output, `{"username":"traderjoe","balance":44400009}`)
   assert.equal(JSON.parse(output), trader, 'matches original')
 })
 
-test('Order', () => {
+test('Buy Order', () => {
   const trader = {
     username: 'traderjoe',
     balance: 44400009
   }
   const buyOrder = {
-    id: id(),
+    id: getUid(),
     trader: trader,
     ticker: 'TW',
     side: 'Buy',
@@ -38,23 +37,23 @@ test('Order', () => {
   assert.equal(buyOrder.trader.username, 'traderjoe')
 })
 
-test('Order', () => {
+test('Sell Order', () => {
   const trader = {
     username: 'traderjoe',
     balance: 44400009
   }
   const buyOrder = {
-    id: id(),
+    id: getUid(),
     trader: trader,
     ticker: 'TW',
-    side: 'Buy',
+    side: 'Sell',
     limit: 10000,
     quantity: 20,
     filledQuantity: 20,
-    status: 'Completed',
+    status: 'Open',
     createdAt: new Date().getTime()
   }
-  assert.equal(buyOrder.status, 'Completed')
+  assert.equal(buyOrder.status, 'Open')
   assert.equal(buyOrder.ticker, 'TW')
   assert.equal(buyOrder.quantity, buyOrder.filledQuantity)
 })
@@ -65,7 +64,7 @@ test('Trade', () => {
     balance: 1400022
   }
   const buyOrder = {
-    id: id(),
+    id: getUid(),
     trader: trader,
     ticker: 'TW',
     side: 'Buy',
@@ -76,7 +75,7 @@ test('Trade', () => {
     createdAt: new Date().getTime()
   }
   const sellOrder = {
-    id: id(),
+    id: getUid(),
     trader: trader,
     ticker: 'TW',
     side: 'Sell',
@@ -102,10 +101,17 @@ test('Trade', () => {
   assert.equal(trade.quantity, buyOrder.filledQuantity)
 })
 
-test('Add Order, create trader acct', () => {
-  let order = Clob.add('traderjoe', 'Buy', 'TW', 1999, 100)
+test('Place a bid as a Buy Order, create trader acct', () => {
+  let order = bid('traderjoe', 'Buy', 'TW', 1999, 100)
   assert.equal(order.trader?.username, 'traderjoe')
   assert.equal(order.quantity, 100)
+})
+
+//TODO
+test('Place an order, cancels it', () => {
+  //...
+  // assert.equal(order.trader?.username, 'traderjoe')
+  // assert.equal(order.quantity, 100)
 })
 
 test.run()

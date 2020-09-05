@@ -1,40 +1,41 @@
-import { Order } from './model'
+import { Ticker } from './model'
+import {log} from '../src/utils'
 import * as OrderBook from './orderbooks'
 
-const Buy = (
-  username: string,
-  ticker: string,
-  limit: number,
-  quantity: number
-): string => {
-  let order = OrderBook.add(username, 'Buy', 'TW', 10000, 20)
-  return JSON.stringify(order)
+function Buy(username: string, ticker: Ticker, limit: number, quantity: number): string {
+  try {
+    let order = OrderBook.bid(username, 'Buy', ticker, limit, quantity)
+    return JSON.stringify(order)
+  }
+  catch(error) {
+    log(`Error: ${error}`)
+    return `This Buy order has failed. Please try later`
+  }
 }
 
-const Sell = (
-  username: string,
-  ticker: string,
-  limit: number,
-  quantity: number
-): Order | Error => {
-  throw Error('SELL Not Implemented!')
+function Sell(username: string, ticker: Ticker, limit: number,  quantity: number): string {
+  try {
+    let order = OrderBook.bid(username, 'Sell', ticker, limit, quantity)
+    return JSON.stringify(order)
+  }
+  catch(error) {
+    log(`Error: ${error}`)
+    return `This Sell order has failed. Please try later`
+  }
 }
 
-const Cancel = (
-  username: string,
-  ticker: string,
-  price: number,
-  quantity: number
-): Order => {
-  throw Error('CANCEL Not Implemented!')
+function Cancel(username: string, id: string, ticker: Ticker): string {
+  try {
+    let result = OrderBook.cancel(username, id, ticker, 'Buy')
+    return JSON.stringify(result)
+  }
+  catch(error) {
+    log(`Error: ${error}`)
+    return `This Cancel order has failed. Please try later`
+  }
 }
 
-const Show = (
-  username: string,
-  ticker: string,
-  price: number,
-  quantity: number
-): Order | Error => {
+const Show = (ticker: string, top:number=10): ['TODO'] | Error => {
   throw Error('SHOW Not Implemented!')
 }
 

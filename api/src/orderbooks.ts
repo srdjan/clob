@@ -4,12 +4,12 @@ import {
   Side,
   Trade
 } from './model'
-import { getTrader } from './traders'
-import { Result, id, log } from './utils'
+import * as Traders from './traders'
+import { Result, Uid, getUid, log } from './utils'
 
 type OrderBook = {
-  buyOrders: Order[] //todo: just a placeholder, more appropriate data structure required
-  sellOrders: Order[] //todo: just a placeholder, more appropriate data structure required
+  buyOrders: Map<Uid, Order> //todo: just a placeholder, more appropriate data structure required
+  sellOrders: Map<Uid, Order> //todo: just a placeholder, more appropriate data structure required
 }
 const orderBooks = new Map<Ticker, OrderBook>()
 
@@ -19,14 +19,14 @@ const create = (ticker: Ticker): OrderBook => {
   }
 
   let orderBook = {
-    buyOrders: new Array<Order>(),
-    sellOrders: new Array<Order>()
+    buyOrders: new Map<Uid, Order>(),
+    sellOrders: new Map<Uid, Order>()
   }
   orderBooks.set(ticker, orderBook)
   return orderBook
 }
 
-const execute = (orderBook: OrderBook): Result<Trade> => {
+const match = (orderBook: OrderBook): Result<Trade> => {
   //todo: 
   // match prices
   // execute trade
@@ -37,8 +37,8 @@ const execute = (orderBook: OrderBook): Result<Trade> => {
   }
 }
 
-const add = (userName: string, side: Side, ticker: Ticker, limit: number, quantity: number): Order => {
-  let trader = getTrader(userName)
+const bid = (userName: string, side: Side, ticker: Ticker, limit: number, quantity: number): Order => {
+  let trader = Traders.get(userName, side)
 
   // check if the orderbook for requested ticker exist, and create if not
   let orderBook = orderBooks.get(ticker)
@@ -48,7 +48,7 @@ const add = (userName: string, side: Side, ticker: Ticker, limit: number, quanti
 
   // create order
   let order: Order = {
-    id: id(),
+    id: getUid(),
     trader: trader,
     ticker: ticker,
     side: side,
@@ -60,14 +60,15 @@ const add = (userName: string, side: Side, ticker: Ticker, limit: number, quanti
   }
 
   // persist the order
-  if(order.side === 'Buy') orderBook.buyOrders.push(order)  //todo: replace array with better data structure
-  if(order.side === 'Sell') orderBook.sellOrders.push(order)  //todo: replace array with better data structure
+  if(order.side === 'Buy') orderBook.buyOrders.set(ticker, order)  
+  if(order.side === 'Sell') orderBook.sellOrders.set(ticker, order)  
   
   // find if there are matching orders to execute
-  let result = execute(orderBook) //todo: extract executor into separate file?
+  let result = match(orderBook) //todo: extract executor into separate file?
   if (!result.outcome) {
     return order
   }
+
   if(result && result.data && result.data.quantity < quantity) {
     order.status = 'Open'
     order.filledQuantity = quantity - result.data.quantity
@@ -77,26 +78,41 @@ const add = (userName: string, side: Side, ticker: Ticker, limit: number, quanti
     order.filledQuantity = quantity
   }
   else {
-    throw new Error('Invalid state after trade execution')
+    throw new Error(`Orderbooks: Invalid state after trade execution`)
   }
   return order
 }
 
-const cancel = (ticker: Ticker, id: string): Result<{}> => {
+const cancel = (userName: string, id: Uid, ticker: Ticker, side: Side): boolean => {
+  Traders.verify(userName)
+
   let orderBook = orderBooks.get(ticker)
   if (!orderBook) {
     log(`Orderbooks: Invalid request, OrderBook for ${ticker} not found`)
-    return {
-      outcome: false,
-      message: 'Not implemented yet'
+    throw new Error(`Order Book not found for ${ticker}`)
+  }
+
+  let order: Order
+  if (side === 'Buy') {
+    order = orderBook.buyOrders.get(id) as Order
+    if(order.status === 'Open' || order.status === 'Partial') {
+      order.status = 'Canceled'
+      orderBook.buyOrders.set(id, order)
     }
   }
-
-  let result = orderBooks.delete(order.ticker)
-  if(!result) {
-    //todo: add logging
+  else if (side === 'Sell') {
+    order = orderBook.sellOrders.get(id) as Order
+    if(order.status === 'Open' || order.status === 'Partial') {
+      order.status = 'Canceled'
+      orderBook.sellOrders.set(id, order)
+    }
   }
-  return result
+  else {
+    throw new Error(`Orderbooks: Invalid request, OrderBook ${side} incorrect`)
+  }
+
+  log(`Orderbooks: Order with id: ${id}  canceled`)
+  return true
 }
 
-export { add, cancel }
+export { bid, cancel }
