@@ -11,4 +11,13 @@ type Uid = string
 
 const log = console.log //todo: replace with real logger after v0.1
 
-export { Money, Result, Uid, getUid, log } 
+function * counter () {
+  let current = 0
+  while (true) {
+    yield ++current
+  }
+}
+const seqGenerator = counter()
+log(`Initialize Sequence generator: ${seqGenerator.next().value}`)
+
+export { Money, Result, Uid, getUid, log, seqGenerator } 

@@ -1,6 +1,6 @@
 import { Ticker } from './model'
 import { log } from '../src/utils'
-import * as OrderBook from './orderbooks'
+import * as Market from './market'
 
 function Buy (
   username: string,
@@ -9,7 +9,7 @@ function Buy (
   quantity: number
 ): string {
   try {
-    let order = OrderBook.bid(username, 'Buy', ticker, limit, quantity)
+    let order = Market.bid(username, 'Buy', ticker, limit, quantity)
     return JSON.stringify(order)
   } catch (error) {
     log(`Error: ${error}`)
@@ -24,7 +24,7 @@ function Sell (
   quantity: number
 ): string {
   try {
-    let order = OrderBook.bid(username, 'Sell', ticker, limit, quantity)
+    let order = Market.bid(username, 'Sell', ticker, limit, quantity)
     return JSON.stringify(order)
   } catch (error) {
     log(`Error: ${error}`)
@@ -34,7 +34,7 @@ function Sell (
 
 function Cancel (username: string, id: string, ticker: Ticker): string {
   try {
-    let result = OrderBook.cancel(username, id, ticker, 'Buy')
+    let result = Market.cancel(username, id, ticker, 'Buy')
     return JSON.stringify(result)
   } catch (error) {
     log(`Error: ${error}`)

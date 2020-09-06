@@ -1,22 +1,11 @@
-import { Side } from './model'
+import { Trader } from './model'
 import { log } from './utils'
-
-type Trader = {
-  username: string
-  password?: string
-}
 
 const traders = new Map<string, Trader>()
 
-function get (userName: string, side: Side): Trader {
-  if (traders.has(userName)) {
+function getOrCreate (userName: string): Trader {
+  if (verify(userName)) {
     return traders.get(userName) as Trader
-  }
-
-  if (side !== 'Buy') {
-    throw new Error(
-      `Traders: invalid request to cancel sell order for non-existing account`
-    )
   }
 
   log(`Traders: trader's first bid, auto registering ${userName}`)
@@ -28,10 +17,10 @@ function get (userName: string, side: Side): Trader {
 function verify (userName: string): boolean {
   if (!traders.has(userName)) {
     throw new Error(
-      `Traders: invalid user: ${userName}, cancel order not allowed`
+      `Traders: invalid user: ${userName}, order not allowed`
     )
   }
   return true
 }
 
-export { Trader, get, verify }
+export { getOrCreate, verify }
