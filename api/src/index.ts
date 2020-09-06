@@ -1,49 +1,72 @@
-import { Ticker } from './model'
-import { log } from '../src/utils'
-import * as Market from './market'
+import { Ticker, Order, Side } from './model'
+import { seqGenerator, log } from './utils'
+import * as Ob from './orderbook'
+import * as Traders from './traders'
 
-function Buy (
+function bid (
   username: string,
   ticker: Ticker,
+  side: Side,
   limit: number,
   quantity: number
 ): string {
   try {
-    let order = Market.bid(username, 'Buy', ticker, limit, quantity)
-    return JSON.stringify(order)
+    let trader = Traders.getOrCreate(username)
+
+    let order: Order = {
+      id: seqGenerator(),
+      trader: trader,
+      ticker: ticker,
+      side: side,
+      limit: limit,
+      quantity: quantity,
+      filledQuantity: 0,
+      status: 'Open',
+      createdAt: new Date().getTime()
+    }
+
+    // find if there are matching orders to execute
+    let trade = Ob.execute(order)
+    if (!trade) {
+      return 'No matches, No Trade!'
+    }
+
+    if (trade.quantity < quantity) {
+      order.status = 'Open'
+      order.filledQuantity = quantity - trade.quantity
+    } else if (trade.quantity === quantity) {
+      order.status = 'Completed'
+      order.filledQuantity = quantity
+    } else {
+      log(`Market: Invalid order: ${order} state after trade ${trade} execution`)
+      throw new Error(
+        `Market: Invalid order: ${order} state after trade ${trade} execution`
+      )
+    }
+    return 'Success'
   } catch (error) {
-    log(`Error: ${error}`)
-    return `This Buy order has failed. Please try later`
+    log(`Market: Error ${error}`)
+    return `This BID request has failed. Please try later`
   }
 }
 
-function Sell (
-  username: string,
-  ticker: Ticker,
-  limit: number,
-  quantity: number
-): string {
+function cancel (username: string, id: string): string {
   try {
-    let order = Market.bid(username, 'Sell', ticker, limit, quantity)
-    return JSON.stringify(order)
-  } catch (error) {
-    log(`Error: ${error}`)
-    return `This Sell order has failed. Please try later`
-  }
-}
+    Traders.verify(username)
 
-function Cancel (username: string, id: string, ticker: Ticker): string {
-  try {
-    let result = Market.cancel(username, id, ticker, 'Buy')
-    return JSON.stringify(result)
+    if (!Ob.cancelOrder(id)) {
+      throw new Error(`Markets: Order for id: ${id} not found`)
+    }
+    log(`Market: Order with id: ${id} canceled`)
   } catch (error) {
-    log(`Error: ${error}`)
+    log(`MArket: Error ${error}`)
     return `This Cancel order has failed. Please try later`
   }
+  return 'Success'
 }
 
-const Show = (ticker: string, top: number = 10): ['TODO'] | Error => {
+const show = (ticker: string, top: number = 10): ['TODO'] | Error => {
   throw Error('SHOW Not Implemented!')
 }
 
-export default { Buy, Sell, Cancel, Show }
+export default { bid, cancel, show }

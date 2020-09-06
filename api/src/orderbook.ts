@@ -1,31 +1,42 @@
-import { Order, Trade, Ticker, Side } from './model'
-import { Uid } from './utils'
+import { Order, Trade, Ticker } from './model'
 
 const maxDepth = 1000
-type Bid = [id: Uid, price: number, quantity: number]
 
-//todo: optimize (try https://github.com/snovakovic/fast-sort)
-const orderBooks = new Map<Ticker, 
-                            [ buyOrders: Array<Bid>, 
-                              sellOrders: Array<Bid>
-                            ]>()
+const OrderBooks = new Map<Ticker, { buyBids: Array<number>, sellBids: Array<number>}>()
+const Orders = new Map<number, Order>()
 
-const getOrder = (id: Uid, ticker: Ticker, side: Side): Order => {
-  if (side === 'Buy') {
-    return orderBooks[ticker].buyOrders[id]
-  }
-  else if (side === 'Sell') {
-    return orderBooks[ticker].sellOrders[id]
-  }
+const getOrder = (id: number): Order => {
+  return Orders.get(id) as Order
 }
 
-const saveOrder = (order: Order): boolean => {
-  if (order.side === 'Buy') {
-    orderBooks[order.ticker].buyOrders[order.id] = order
-  } else if (order.side === 'Sell') {
-    orderBooks[order.ticker].sellOrders[order.id] = order
+const cancelOrder = (id: number): boolean => {
+  let order = Orders.get(id) as Order
+  if (!order) {
+    throw new Error(`Orderbook: Order with id: ${id} not found`)
   }
-  return true
+  order.status = 'Canceled'
+  //todo: log audit of a change
+
+  const index = 0
+  let ticker: Ticker = 'None'
+  ticker = order.ticker
+  let bids = OrderBooks.get(ticker)
+  if (!bids) {
+    throw new Error(`Orderbook: Bids for ticker: ${ticker} not found`)
+  }
+
+  if(order.side === 'Buy') {
+    let index = bids.buyBids.indexOf(id, 0)
+    if (index > -1) bids.buyBids.splice(index, 1)
+    return true
+  }
+
+  if(order.side === 'Sell') {
+    let index = bids.buyBids.indexOf(id, 0)
+    if (index > -1) bids.buyBids.splice(index, 1)
+    return true
+  }
+  throw new Error(`Orderbooks: invalid side: ${order.side}`)
 }
 
 function execute (order: Order): Trade {
@@ -39,78 +50,123 @@ function execute (order: Order): Trade {
     message: 'message'
   }
 
-  let bid: Bid = match(order)
-  if (bid[1] > 0) {
-    trade.price = bid[1]
-    trade.quantity = bid[2]
+  if(match(order, trade)) {
     trim(order)
     sort(order)
   }
   return trade
 }
 
-function match (order: Order): Bid {
+function match (order: Order, trade: Trade): boolean {
+  let bids = OrderBooks.get(order.ticker)
+  if (!bids) {
+    throw new Error(`Orderbook.match: Bids for ticker: ${order.ticker} not found`)
+  }
+
   if (order.side === 'Buy') {
     if (canBuy(order)) {
-      return buy(order)
+      return buy(order, trade)
     }
-    orderBooks[order.ticker].buyOrders.push([order.id, order.limit, order.quantity])
+    bids.buyBids.push(order.limit)  //todo: use <limit>.<id> format for the item of array
   } else if (order.side === 'Sell') {
     if (canSell(order)) {
-      return sell(order)
+      return sell(order, trade)
     }
-    orderBooks[order.ticker].sellOrders.push(order.limit)
+    bids.sellBids.push(order.limit) //todo: use <limit>.<id> format for the item of array
   } 
   throw new Error(`Orderbook: invalid order side: ${order}`)
 }
 
-function buy (order: Order): Bid {
+function buy (order: Order, trade: Trade): boolean {
   if (!canBuy(order)) {
-    return [null, 0, 0] // no sellers
+    return false // no sellers
   }
-  return orderBooks[order.ticker].buyOrders.shift()
+  let bids = OrderBooks.get(order.ticker)
+  if(!bids) {
+    throw new ErrorEvent(`Orderbook.buy: no bids, order: ${order}`)
+  } 
+  let matchingOrder = bids.buyBids.shift()
+  trade.price = 0 //todo: matchingOrder.limit
+  trade.quantity = 0 // todo: matchingOrder.quantity
+  return true
 }
 
 function canBuy (order: Order) : boolean {
-  if (orderBooks[order.ticker].sellOrders.length == 0) {
+  let bids = OrderBooks.get(order.ticker)
+  if (!bids) {
+    throw new Error(`Orderbook.canBuy: Bids for ticker: ${order.ticker} not found`)
+  }
+
+  if (bids.sellBids.length === 0) {
     return false // No sellers
   }
-  if (orderBooks[order.ticker].sellOrders[0] < order.limit) {
+  if (bids.sellBids[0] < order.limit) {
     return true // there are sellers at given or better price
   }
   return false
 }
 
-function sell (order: Order): Bid {
+function sell (order: Order, trade: Trade): boolean {
   if (!canSell(order)) {
-    return [null, 0, 0] // no buyers
+    return false // no buyers
   }
-  return orderBooks[order.ticker].buyOrders.shift()
+  let bids = OrderBooks.get(order.ticker)
+  if (!bids) {
+    throw new Error(
+      `Orderbook.sell: Bids for ticker: ${order.ticker} not found`
+    )
+  }
+
+  let matchingOrder = bids.sellBids.shift()
+  trade.price = 0 //todo: matchingOrder.limit
+  trade.quantity = 0 // todo: matchingOrder.quantity
+  return true
 }
 
 function canSell (order: Order): boolean {
-  if (orderBooks[order.ticker].buyOrders.length == 0) {
+  let bids = OrderBooks.get(order.ticker)
+  if (!bids) {
+    throw new Error(
+      `Orderbook.canBuy: Bids for ticker: ${order.ticker} not found`
+    )
+  }
+
+  if (bids.buyBids.length === 0) {
     return false // no buyers
   }
-  if (orderBooks[order.ticker].buyOrders[0] > order.limit) {
+  if (bids.buyBids[0] > order.limit) {
     return true // there are buyers at given or better price
   }
   return false
 }
 
 function sort(order: Order) {
-  orderBooks[order.ticker].buyOrders.sort((a, b) => b - a).slice(0)
-  orderBooks[order.ticker].sellOrders.sort((a, b) => a - b).slice(0)
+  let bids = OrderBooks.get(order.ticker)
+  if (!bids) {
+    throw new Error(
+      `Orderbook.sort: Bids for ticker: ${order.ticker} not found`
+    )
+  }
+
+  bids.buyBids.sort((a, b) => b - a).slice(0)
+  bids.sellBids.sort((a, b) => a - b).slice(0)
 }
 
 function trim(order: Order) {
-  if (orderBooks[order.ticker].buyOrders.length >= maxDepth) {
-    orderBooks[order.ticker].buyOrders.splice(-1, 1)
+  let bids = OrderBooks.get(order.ticker)
+  if (!bids) {
+    throw new Error(
+      `Orderbook.canBuy: trim for ticker: ${order.ticker} not found`
+    )
   }
-  if (orderBooks[order.ticker].sellOrders.length >= maxDepth) {
-    orderBooks[order.ticker].sellOrders.splice(-1, 1)
+
+  if (bids.buyBids.length >= maxDepth) {
+    bids.buyBids.splice(-1, 1)
+  }
+  if (bids.sellBids.length >= maxDepth) {
+    bids.sellBids.splice(-1, 1)
   }
 }
 
-export { execute, getOrder, saveOrder }
+export { execute, getOrder, cancelOrder }
 

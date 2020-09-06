@@ -30,7 +30,7 @@ test('Market: Sell Order', () => {
 
 test('Market: Cancels order', () => {
   let trade = Market.bid('treaderjoe', 'Sell', 'TW', 10, 100)
-  let result = Market.cancel('treaderjoe', trade.sellOrderId, 'TW', 'Sell')
+  let result = Market.cancel('treaderjoe', trade.sellOrderId)
 
   assert.equal(result, true)
 })

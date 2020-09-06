@@ -1,6 +1,6 @@
-import { Uid, Money } from './utils'
+import { Money } from './utils'
 
-type Ticker = 'TW' | 'NET' | 'T'
+type Ticker = 'TW' | 'NET' | 'T' | 'None'
 type Quantity = number
 type Side = 'Buy' | 'Sell'
 type Status = 'Open' | 'Partial' | 'Completed' | 'Canceled'
@@ -12,7 +12,7 @@ type Trader = {
 }
 
 type Order = {
-  id: Uid
+  id: number
   trader: Trader
   ticker: Ticker
   side: Side
@@ -29,8 +29,8 @@ type Trade = {
   ticker: Ticker
   price: Money
   quantity: Quantity
-  buyOrderId: Uid
-  sellOrderId: Uid
+  buyOrderId: number
+  sellOrderId: number
   createdAt: Datetime
   message: string
 }

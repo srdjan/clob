@@ -1,5 +1,5 @@
 import { Ticker, Order, Side, Trade } from './model'
-import { Uid, makeUid, log } from './utils'
+import { seqGenerator, log } from './utils'
 import * as Ob from './orderbook'
 import * as Traders from './traders'
 
@@ -7,8 +7,8 @@ let emptyTrade: Trade = {
   ticker: 'None',
   price: 0,
   quantity: 0,
-  buyOrderId: '',
-  sellOrderId: '',
+  buyOrderId: -1,
+  sellOrderId: -1,
   createdAt: 0,
   message: `No Match - Order placed!`
 }
@@ -25,7 +25,7 @@ const bid = (
 
   // create order
   let order: Order = {
-    id: makeUid(),
+    id: seqGenerator(),
     trader: trader,
     ticker: ticker,
     side: side,
@@ -57,7 +57,7 @@ const bid = (
   return trade
 }
 
-const cancel = (userName: string, id: Uid): boolean => {
+const cancel = (userName: string, id: number): boolean => {
   Traders.verify(userName)
 
   if (! Ob.cancelOrder(id)) {
