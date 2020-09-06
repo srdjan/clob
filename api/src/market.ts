@@ -10,7 +10,11 @@ let emptyTrade: Trade = {
   buyOrderId: -1,
   sellOrderId: -1,
   createdAt: 0,
-  message: `No Match - Order placed!`
+  message: `No Match - No Trade. Order placed!`
+}
+
+const findOrder = (id: number): Order => {
+  return Ob.getOrder(id)
 }
 
 const bid = (
@@ -19,7 +23,7 @@ const bid = (
   ticker: Ticker,
   limit: number,
   quantity: number
-): Trade => {
+): [Trade, Order] => {
   // get or create trader
   let trader = Traders.getOrCreate(userName)
 
@@ -39,7 +43,7 @@ const bid = (
   // find if there are matching orders to execute
   let trade = Ob.execute(order)
   if (!trade) {
-    return emptyTrade
+    return [emptyTrade, order]
   }
 
   if (trade.quantity < quantity) {
@@ -54,7 +58,7 @@ const bid = (
       `Market: Invalid order: ${order} state after trade ${trade} execution`
     )
   }
-  return trade
+  return [trade, order]
 }
 
 const cancel = (userName: string, id: number): boolean => {
@@ -67,4 +71,4 @@ const cancel = (userName: string, id: number): boolean => {
   return true
 }
 
-export { bid, cancel }
+export { findOrder, bid, cancel }

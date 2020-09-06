@@ -50,7 +50,7 @@ function bid (
   }
 }
 
-function cancel (username: string, id: string): string {
+function cancel (username: string, id: number): string {
   try {
     Traders.verify(username)
 

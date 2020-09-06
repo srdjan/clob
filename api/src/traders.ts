@@ -4,7 +4,7 @@ import { log } from './utils'
 const traders = new Map<string, Trader>()
 
 function getOrCreate (userName: string): Trader {
-  if (verify(userName)) {
+  if (traders.has(userName)) {
     return traders.get(userName) as Trader
   }
 

@@ -34,5 +34,6 @@ type Trade = {
   createdAt: Datetime
   message: string
 }
+type NoTrade = 'None'
 
-export { Ticker, Side, Order, OrderBook, Trade, Trader }
+export { Ticker, Side, Order, OrderBook, Trade, NoTrade, Trader }
