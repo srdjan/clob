@@ -1,16 +1,16 @@
 import { Ticker, Order, Side, Trade } from './model'
-import { Uid, getUid, log } from './utils'
+import { Uid, makeUid, log } from './utils'
 import * as Ob from './orderbook'
 import * as Traders from './traders'
 
 let emptyTrade: Trade = {
-  ticker: null,
+  ticker: 'None',
   price: 0,
   quantity: 0,
   buyOrderId: '',
   sellOrderId: '',
-  createdAt: null,
-  message: ';`No Match - Order placed!`'
+  createdAt: 0,
+  message: `No Match - Order placed!`
 }
 
 const bid = (
@@ -25,7 +25,7 @@ const bid = (
 
   // create order
   let order: Order = {
-    id: getUid(),
+    id: makeUid(),
     trader: trader,
     ticker: ticker,
     side: side,
@@ -57,34 +57,13 @@ const bid = (
   return trade
 }
 
-const cancel = (
-  userName: string,
-  id: Uid,
-  ticker: Ticker,
-  side: Side
-): boolean => {
+const cancel = (userName: string, id: Uid): boolean => {
   Traders.verify(userName)
 
-  let order: Order = Ob.getOrder(id, ticker, side)
-  if (!order) {
+  if (! Ob.cancelOrder(id)) {
     throw new Error(`Markets: Order for id: ${id} not found`)
   }
-
-  if (side === 'Buy') {
-    if (order.status === 'Open' || order.status === 'Partial') {
-      order.status = 'Canceled'
-      Ob.saveOrder(order)
-    }
-  } else if (side === 'Sell') {
-    order = Ob.getOrder(id, ticker, side)
-    if (order.status === 'Open' || order.status === 'Partial') {
-      order.status = 'Canceled'
-      Ob.saveOrder(order)
-    }
-  } else {
-    throw new Error(`Orderbooks: Invalid request, OrderBook ${side} incorrect`)
-  }
-  log(`Orderbooks: Order for ${side} with id: ${id} canceled`)
+  log(`Orderbooks: Order with id: ${id} canceled`)
   return true
 }
 
