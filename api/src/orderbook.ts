@@ -1,3 +1,4 @@
+import { bid } from './market'
 import { Order, OrderBook, Bids, Trade, Ticker, Side } from './model'
 import { log } from './utils'
 
@@ -85,18 +86,21 @@ function match (order: Order, trade: Trade): boolean {
   throw new Error(`Orderbook: invalid order side: ${order}`)
 }
 
-function execute(side: Side, id: number, bids: Bids, trade: Trade): boolean {
+function execute(id: number, bids: Bids, trade: Trade): boolean {
   let matchingOrder = bids.get(id)
   if(matchingOrder) {
     trade.price = matchingOrder.limit
-    trade.quantity = getQuantity(side, trade, matchingOrder)
+    trade.quantity = getQuantity(trade.quantity, matchingOrder.limit)
     return true
   }
   return false
 }
 
-function getQuantity(side: Side, trade: Trade, match: Order): number {
-  return match.quantity //todo: add logic for partial orders
+function getQuantity(orderQuantity: number, bidQuantity: number): number {
+  if(bidQuantity < orderQuantity) {
+    return bidQuantity 
+  }
+  return orderQuantity 
 }
 
 function canBuy (bids: Bids, limit: number): boolean {
