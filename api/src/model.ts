@@ -23,7 +23,8 @@ type Order = {
   createdAt?: Datetime
 }
 
-type OrderBook = []
+type OrderBook = Map<Ticker, {buyBids: Bids, sellBids: Bids}>
+type Bids = Map<number, Order>
 
 type Trade = {
   ticker: Ticker
@@ -36,4 +37,4 @@ type Trade = {
 }
 type NoTrade = 'None'
 
-export { Ticker, Side, Order, OrderBook, Trade, NoTrade, Trader }
+export { Ticker, Side, Order, OrderBook, Bids, Trade, NoTrade, Trader }

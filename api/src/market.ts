@@ -41,7 +41,7 @@ const bid = (
   }
 
   // find if there are matching orders to execute
-  let trade = Ob.execute(order)
+  let trade = Ob.process(order)
   if (!trade) {
     return [emptyTrade, order]
   }
