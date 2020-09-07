@@ -4,7 +4,7 @@ import Clob from '../src/index'
 
 const test = suite('test')
 
-test('Buy', () => {
+test.skip('Buy', () => {
   let response = Clob.bid('traderjoe', 'TW', 'Buy', 10000, 10)
   let result = JSON.parse(response)
   assert.equal(result.outcome, undefined)
@@ -13,13 +13,13 @@ test('Buy', () => {
   assert.equal(order.ticker, 'TW')
 })
 
-test('Sell', () => {
+test.skip('Sell', () => {
   let json = Clob.bid('traderjoe', 'TW', 'Sell', 9999, 10)
   let result = JSON.parse(json)
   assert.equal(result.outcome, undefined)
 })
 
-test('Cancel', () => {
+test.skip('Cancel', () => {
   let response = Clob.bid('traderjoe', 'TW', 'Buy', 10000, 10)
   let order = JSON.parse(response)
 

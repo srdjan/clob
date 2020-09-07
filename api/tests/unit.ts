@@ -25,8 +25,8 @@ testTraders.run()
 
 // ---- Market --------
 const testMarket = suite('Test Market')
-testMarket('Market: make first Buy Order', () => {
-  let [trade, order] = Market.bid('treaderjoe', 'Buy', 'TW', 10, 100)
+testMarket('make first Buy Order', () => {
+  let [trade, order] = Market.bid('joe', 'Buy', 'TW', 10, 100)
 
   assert.equal(trade.ticker, 'TW')
   assert.equal(trade.quantity, 0)
@@ -34,8 +34,8 @@ testMarket('Market: make first Buy Order', () => {
   assert.equal(trade.message, 'NoOrder')
 })
 
-testMarket('Market: make first Sell Order', () => {
-  let [trade, order] = Market.bid('treaderjoe', 'Sell', 'TW', 10, 100)
+testMarket('make first Sell Order', () => {
+  let [trade, order] = Market.bid('joe', 'Sell', 'TW', 10, 100)
 
   assert.equal(trade.ticker, 'TW')
   assert.equal(trade.quantity, 0)
@@ -43,17 +43,15 @@ testMarket('Market: make first Sell Order', () => {
   assert.equal(trade.message, 'NoOrder')
 })
 
-testMarket('Market: Cancels order', () => {
-  let [trade, order] = Market.bid('treaderjoe', 'Sell', 'TW', 10, 100)
-  let savedOrder = Market.findOrder(order.id)
-  const output = JSON.stringify(savedOrder)
+testMarket('cancel order', () => {
+  let [trade, placedOrder] = Market.bid('joe', 'Sell', 'TW', 10, 100)
+  log(`placed order: ${placedOrder.id}`)
 
-  log(`Output: ${output}`)
-  // assert.equal(order.limit, savedOrder.limit)
-  // assert.equal(order.quantity, savedOrder.quantity)
+  let savedOrder = Market.findOrder(placedOrder.id)
+  log(`saved order: ${savedOrder.id}`)
 
-  // let result = Market.cancel('treaderjoe', order.id)
-  // assert.equal(result, true)
+  assert.equal(placedOrder.limit, savedOrder.limit)
+  assert.equal(placedOrder.quantity, savedOrder.quantity)
 })
 
 testMarket.run()

@@ -1,5 +1,4 @@
-import { bid } from './market'
-import { Order, OrderBook, Bids, Trade, Ticker, Side } from './model'
+import { Order, OrderBook, Bids, Trade, Ticker } from './model'
 import { log } from './utils'
 
 const orders = new Map<number, Order>()
@@ -8,16 +7,15 @@ const sortAsc = (a:any, b:any) =>  (a[1].limit > b[1].limit && 1) || (a[1].limit
 const sortDsc = (a:any, b:any) =>  (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 
 const getOrder = (id: number): Order => {
-  return orders.get(id) as Order
+  let order = orders.get(id) as Order
+  if (!order) {
+    throw new Error(`Orderbook.getOrder: Order with id: ${id} not found`)
+  }
+  return order
 }
 
 const cancelOrder = (id: number): boolean => {
-  let order = orders.get(id) as Order
-  if (!order) {
-    throw new Error(`Orderbook: Order with id: ${id} not found`)
-  }
-  order.status = 'Canceled'
-  //todo: log audit of (all) changes or use persisted data structures
+  let order = getOrder(id)
 
   const index = 0
   let ticker: Ticker = 'None'
@@ -29,17 +27,23 @@ const cancelOrder = (id: number): boolean => {
 
   if (order.side === 'Buy') {
     bids.buyBids.delete(id)
-    return true
+  }
+  else if (order.side === 'Sell') {
+    bids.sellBids.delete(id)
+  }
+  else {
+    throw new Error(`Orderbooks: invalid side: ${order.side}`)
   }
 
-  if (order.side === 'Sell') {
-    bids.sellBids.delete(id)
-    return true
-  }
-  throw new Error(`Orderbooks: invalid side: ${order.side}`)
+  //todo: log audit of (all) changes or use persisted data structures
+  order.status = 'Canceled'
+  orders.set(id, order)
+  return true
 }
 
 function process(order: Order): Trade {
+  orders.set(order.id, order)
+
   let trade: Trade = {
     ticker: order.ticker,
     price: 0,
@@ -52,7 +56,6 @@ function process(order: Order): Trade {
 
   if (match(order, trade)) {
     trade.message = 'Success'
-    return trade
   }
   return trade
 }

@@ -24,7 +24,7 @@ const bid = (
   limit: number,
   quantity: number
 ): [Trade, Order] => {
-  // get or create trader
+  // get or create user/trader
   let trader = Traders.getOrCreate(userName)
 
   // create order
@@ -58,6 +58,7 @@ const bid = (
       `Market: Invalid order: ${order} state after trade ${trade} execution`
     )
   }
+  
   return [trade, order]
 }
 
