@@ -8,14 +8,8 @@ type Result<T> = {
 
 const log = console.log //todo: replace with real logger after v0.1
 
-function * counter () {
-  let current = 0
-  while (true) {
-    yield ++current
-  }
-}
+// keep it simple 
 let currentID: number = 0
 const seqGenerator = () => currentID++
-// log(`Initialize Sequence generator: ${seqGenerator.next().value}`)
 
 export { Money, Result, log, seqGenerator } 
