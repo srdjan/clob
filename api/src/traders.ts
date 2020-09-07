@@ -1,7 +1,7 @@
-import { Trader } from './model'
+import { Trader, Traders } from './model'
 import { log } from './utils'
 
-const traders = new Map<string, Trader>()
+const traders: Traders = new Map<string, Trader>()
 
 function getOrCreate (userName: string): Trader {
   if (traders.has(userName)) {

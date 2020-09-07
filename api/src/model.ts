@@ -10,6 +10,7 @@ type Trader = {
   username: string
   password?: string
 }
+type Traders = Map<string, Trader>
 
 type Order = {
   id: number
@@ -37,4 +38,4 @@ type Trade = {
 }
 type NoTrade = 'None'
 
-export { Ticker, Side, Order, OrderBook, Bids, Trade, NoTrade, Trader }
+export { Ticker, Side, Order, OrderBook, Bids, Trade, Traders, NoTrade, Trader }
