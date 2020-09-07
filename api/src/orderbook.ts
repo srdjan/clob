@@ -66,7 +66,7 @@ function match (order: Order, trade: Trade): boolean {
 
   if (order.side === 'Buy') {
     if (canBuy(bids.buyBids, order.limit)) {
-      execute('Buy', order.id, bids.buyBids, trade)
+      execute(order.id, bids.buyBids, trade)
     }
     bids.buyBids.set(order.id, order)
     let sorted = new Map([...bids.buyBids].sort(sortAsc))
@@ -76,7 +76,7 @@ function match (order: Order, trade: Trade): boolean {
   
   if (order.side === 'Sell') {
     if (canSell(bids.sellBids, order.limit)) {
-      execute('Sell', order.id, bids.sellBids, trade)
+      execute(order.id, bids.sellBids, trade)
     }
     bids.sellBids.set(order.id, order)
     let sorted = new Map([...bids.sellBids].sort(sortDsc))
