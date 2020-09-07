@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc ./src/index.ts --outDir dist/ --module ES2020",
+    "build": "tsc ./src/index.ts --downlevelIteration --module ES2020 --outDir dist/",
     "test:unit": "ts-node -r esm ./tests/unit.ts",
     "test:int": "ts-node -r esm ./tests/int.ts"
   },

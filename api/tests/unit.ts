@@ -1,7 +1,7 @@
-import * as Market from '../src/market'
-import * as Traders from '../src/traders'
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
+import * as Market from '../src/market'
+import * as Traders from '../src/traders'
 import { log } from '../src/utils'
 
 const test = suite('test')
