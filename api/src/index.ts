@@ -1,7 +1,7 @@
 import { Ticker, Order, Side } from './model'
 import * as Ob from './orderbook'
 import * as Traders from './traders'
-import * as orderId from './orderId'
+import * as OrderId from './orderid'
 import {log} from './utils'
 
 const findOrder = (id: string): string => {
@@ -25,7 +25,7 @@ const bid = (
 
   // create order
   let order: Order = {
-    id: orderId.createAsString(ticker as Ticker, side as Side),
+    id: OrderId.createAsString(ticker as Ticker, side as Side),
     trader: trader,
     ticker: ticker as Ticker,
     side: side as Side,

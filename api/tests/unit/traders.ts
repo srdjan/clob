@@ -22,5 +22,5 @@ testTraders('verify: fail', () => {
   assert.throws(() => Traders.verify('sam'))
 })
 
-testTraders.skip()
+testTraders.run()
 

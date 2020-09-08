@@ -1,12 +1,10 @@
-import { Money } from './utils'
+import { Money, Quantity, Datetime } from './utils'
 
 type Ticker = 'TW' | 'NET' | 'T' | 'None'
-type Quantity = number
-type Side = 'Buy' | 'Sell'
-type Status = 'Open' | 'Partial' | 'Completed' | 'Canceled'
-type Datetime = number // milliseconds
+type Side = 'Buy' | 'Sell' | 'None'
+type Status = 'Open' | 'Partial' | 'Completed' | 'Canceled' | 'None'
 
-type ParsedId = {
+type OrderId = {
   ticker: Ticker
   side: Side
   sequence: number
@@ -19,8 +17,8 @@ type Trader = {
 type Traders = Map<string, Trader>
 
 type Order = {
-  id: number
-  trader: Trader
+  id: string
+  trader?: Trader
   ticker: Ticker
   side: Side
   limit: Money
@@ -28,23 +26,27 @@ type Order = {
   filledQuantity?: Quantity
   status?: Status
   createdAt?: Datetime
-}
+} 
 
 type OrderBook = Map<Ticker, Bids>
 type Bids = {
-  buy: Map<number, Order>,
-  sell: Map<number, Order>
+  buy: Map<string, Order>,
+  sell: Map<string, Order>
 }
 
 type Trade = {
   ticker: Ticker
   price: Money
   quantity: Quantity
-  buyOrderId: number
-  sellOrderId: number
+  buyOrderId: string
+  sellOrderId: string
   createdAt: Datetime
   message: string
 }
-type NoTrade = 'None'
 
-export { Ticker, Side, Order, OrderBook, Bids, Trade, Traders, NoTrade, Trader, ParsedId }
+type MarketResponse = {
+  order: Order,
+  trade?: Trade
+}
+
+export { Ticker, Side, Order, OrderBook, Bids, Trade, Traders, Trader, OrderId, MarketResponse }
