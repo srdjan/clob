@@ -23,8 +23,7 @@ const bid = (
   ticker: Ticker,
   limit: number,
   quantity: number
-): [Trade, Order] => {
-  // get or create user/trader
+): Trade => {
   let trader = Traders.getOrCreate(userName)
 
   // create order
@@ -41,25 +40,25 @@ const bid = (
   }
 
   // find if there are matching orders to execute
-  let trade = Ob.process(order)
-  if (!trade) {
-    return [emptyTrade, order]
-  }
-
-  if (trade.quantity < quantity) {
+  let trade = Ob.match(order)
+  if (trade.quantity < order.quantity) {
     order.status = 'Open'
-    order.filledQuantity = quantity - trade.quantity
-  } else if (trade.quantity === quantity) {
+    order.filledQuantity = order.quantity - trade.quantity
+  } else if (trade.quantity === order.quantity) {
     order.status = 'Completed'
-    order.filledQuantity = quantity
+    order.filledQuantity = order.quantity
   } else {
-    log(`Market: Invalid order: ${order} state after trade ${trade} execution`)
     throw new Error(
       `Market: Invalid order: ${order} state after trade ${trade} execution`
     )
   }
-  
-  return [trade, order]
+  Ob.saveOrder(order)
+
+  if (!trade) {
+    log(`Market.match: No Trade, orderId: ${order.id}`)
+    return emptyTrade
+  }
+  return trade
 }
 
 const cancel = (userName: string, id: number): boolean => {

@@ -24,8 +24,11 @@ type Order = {
   createdAt?: Datetime
 }
 
-type OrderBook = Map<Ticker, {buyBids: Bids, sellBids: Bids}>
-type Bids = Map<number, Order>
+type OrderBook = Map<Ticker, Bids>
+type Bids = {
+  buy: Map<number, Order>,
+  sell: Map<number, Order>
+}
 
 type Trade = {
   ticker: Ticker
