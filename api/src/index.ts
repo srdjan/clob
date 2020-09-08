@@ -1,37 +1,34 @@
-import { Ticker, Order, Side, Trade } from './model'
-import { seqGenerator, log } from './utils'
+import { Ticker, Order, Side } from './model'
 import * as Ob from './orderbook'
 import * as Traders from './traders'
+import * as orderId from './orderId'
+import {log} from './utils'
 
-let emptyTrade: Trade = {
-  ticker: 'None',
-  price: 0,
-  quantity: 0,
-  buyOrderId: -1,
-  sellOrderId: -1,
-  createdAt: 0,
-  message: `No Match - No Trade. Order placed!`
-}
-
-const findOrder = (id: string): Order => {
-  return Ob.getOrder(id)
+const findOrder = (id: string): string => {
+  try {
+    return JSON.stringify(Ob.getOrder(id))
+  }
+  catch(e) {
+    log(`Market.findOrder: unexpected error, orderId: ${id}`)
+  }
+  return JSON.stringify({ Result: 'Unexpected Error' })
 }
 
 const bid = (
   userName: string,
-  side: Side,
-  ticker: Ticker,
+  side: string,
+  ticker: string,
   limit: number,
   quantity: number
-): Trade => {
+): string => {
   let trader = Traders.getOrCreate(userName)
 
   // create order
   let order: Order = {
-    id: seqGenerator(),
+    id: orderId.createAsString(ticker as Ticker, side as Side),
     trader: trader,
-    ticker: ticker,
-    side: side,
+    ticker: ticker as Ticker,
+    side: side as Side,
     limit: limit,
     quantity: quantity,
     filledQuantity: 0,
@@ -39,35 +36,35 @@ const bid = (
     createdAt: new Date().getTime()
   }
 
-  // find if there are matching orders to execute
-  let trade = Ob.match(order)
-  if (trade.quantity < order.quantity) {
-    order.status = 'Open'
-    order.filledQuantity = order.quantity - trade.quantity
-  } else if (trade.quantity === order.quantity) {
-    order.status = 'Completed'
-    order.filledQuantity = order.quantity
-  } else {
-    throw new Error(
-      `Market: Invalid order: ${order} state after trade ${trade} execution`
-    )
+  // Save incoming order and find if there are matching orders to execute
+  try {
+    let response = Ob.match(order)
+      if (!response.trade) {
+      log(`Market.bid: No Trade, orderId: ${order.id}`)
+    }
+    return JSON.stringify(response)
   }
-
-  if (!trade) {
-    log(`Market.match: No Trade, orderId: ${order.id}`)
-    return emptyTrade
+  catch (e) {
+    log(`Market.bid: unexpected error, order: ${order}`) 
   }
-  return trade
+  return JSON.stringify( {Result: 'Unexpected Error'} )
 }
 
-const cancel = (userName: string, id: string): boolean => {
-  Traders.verify(userName)
+//todo: add top level try-catch
+const cancel = (userName: string, id: string): string => {
+  try {
+    Traders.verify(userName)
 
-  if (!Ob.cancelOrder(id)) {
-    throw new Error(`Markets: Order for id: ${id} not found`)
+    if (!Ob.cancelOrder(id)) {
+      throw new Error(`Market.cancel: Order for id: ${id} not found`)
+    }
+    log(`Market.cancel: Order with id: ${id} canceled`)
+    return JSON.stringify({Result: 'Success'})
   }
-  log(`Orderbooks: Order with id: ${id} canceled`)
-  return true
+  catch(e) {
+    log(`Market.cancel: unexpected error, order: ${id}`) 
+  }
+  return JSON.stringify( {Result: 'Unexpected Error'} )
 }
 
 export { findOrder, bid, cancel }
