@@ -56,19 +56,43 @@ test('cancel order', () => {
   // assert.equal(canceledOrder.status, 'Canceled')
 })
 
-test('Complite a full match Buy trade', () => {
+test('Complite a full Buy trade', () => {
+  let sellResponse = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 100))
+  console.log(`buy order: ${JSON.stringify(sellResponse.order)}`)
+  assert.equal(sellResponse.order.limit, 10)
+  assert.equal(sellResponse.order.quantity, 100)
+
+  let buyResponse = Ob.match(makeOrder('sue', 'TW', 'Buy', 10, 100))
+  console.log(`sell trade: ${JSON.stringify(buyResponse && buyResponse.order)}`)
+  assert.equal(buyResponse.order.limit, 10)
+  assert.equal(buyResponse.order.quantity, 100)
+})
+
+test('Complite a full Sell trade', () => {
   let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 100))
-  console.log(`buy trade: ${JSON.stringify(buyResponse)}`)
+  console.log(`buy order: ${JSON.stringify(buyResponse.order)}`)
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
   let sellResponse = Ob.match(makeOrder('sue', 'TW', 'Sell', 10, 100))
-  console.log(`sell trade: ${JSON.stringify(sellResponse && sellResponse.order)}`)
+  console.log(`sell order: ${JSON.stringify(sellResponse && sellResponse.order)}`)
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 })
 
-test.skip('Complite a partial match Sell trade', () => {
+test.skip('Complite a partial Buy trade', () => {
+  let sellResponse = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 100))
+  console.log(`sell order: ${JSON.stringify(sellResponse.order)}`)
+  assert.equal(sellResponse.order.limit, 10)
+  assert.equal(sellResponse.order.quantity, 100)
+
+  let buyResponse = Ob.match(makeOrder('sue', 'TW', 'Buy', 10, 80))
+  console.log(`sell trade: ${JSON.stringify(buyResponse && buyResponse.order)}` )
+  assert.equal(buyResponse.order.limit, 10)
+  assert.equal(buyResponse.order.quantity, 80)
+})
+
+test.skip('Complite a partial Sell trade', () => {
   let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 100))
   console.log(`buy trade: ${JSON.stringify(buyResponse)}`)
   assert.equal(buyResponse.order.limit, 10)
