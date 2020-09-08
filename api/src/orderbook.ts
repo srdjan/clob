@@ -1,20 +1,33 @@
-import { Order, OrderBook, Bids, Trade, Ticker, Side } from './model'
+import { Order, OrderBook, Bids, Trade, Ticker, Side, ParsedId } from './model'
 import { log } from './utils'
 
-const Orders = new Map<number, Order>()
 const OrderBook: OrderBook = new Map<Ticker, Bids>()
 const sortAsc = (a:any, b:any) =>  (a[1].limit > b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 const sortDsc = (a:any, b:any) =>  (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 
-const getOrder = (id: number): Order => {
-  let order = Orders.get(id) as Order
+function parseIdString(id: string) : ParsedId {
+  return {
+    ticker: 'TW', 
+    side: 'Buy', 
+    sequence: 123
+  }
+}
+const getOrder = (id: string): Order => {
+  let {ticker, side, sequence} = parseIdString(id)
+
+  let orderBook = OrderBook.get(ticker)
+  if (!orderBook) {
+    throw new Error(`Orderbook: Bids for ticker: ${ticker} not found`)
+  }
+
+  let order = side === 'Buy' ? orderBook.buy.get(sequence) : orderBook.sell.get(sequence)
   if (!order) {
     throw new Error(`Orderbook.getOrder: Order with id: ${id} not found`)
   }
   return order
 }
 
-const cancelOrder = (id: number): boolean => {
+const cancelOrder = (id: string): boolean => {
   let order = getOrder(id)
 
   let ticker: Ticker = 'None'
@@ -25,10 +38,10 @@ const cancelOrder = (id: number): boolean => {
   }
 
   if (order.side === 'Buy') {
-    orderBook.buy.delete(id)
+    orderBook.buy.delete(order.id)
   }
   else if (order.side === 'Sell') {
-    orderBook.sell.delete(id)
+    orderBook.sell.delete(order.id)
   }
   else {
     throw new Error(`Orderbooks: invalid side: ${order.side}`)
@@ -36,7 +49,6 @@ const cancelOrder = (id: number): boolean => {
 
   //todo: log audit of (all) changes or use persisted data structures
   order.status = 'Canceled'
-  Orders.set(id, order)
   return true
 }
 
@@ -48,6 +60,7 @@ function setOrderBook(order: Order): Bids {
                             sell: new Map<number, Order>()
                           })
   }
+  
   let bids = OrderBook.get(order.ticker) as Bids
   if (order.side === 'Buy') {
     bids.buy.set(order.id, order)
@@ -63,7 +76,6 @@ function setOrderBook(order: Order): Bids {
 }
 
 function match(order: Order): Trade {
-  Orders.set(order.id, order)
   let bids = setOrderBook(order)
  
   if (order.side === 'Buy') {
@@ -123,8 +135,4 @@ function canSell (bids: Bids, limit: number): Order | boolean {
   return false
 }
 
-function saveOrder(order: Order) {
-  Orders.set(order.id, order)
-}
-
-export {  getOrder, match, saveOrder, cancelOrder }
+export {  getOrder, match, cancelOrder }

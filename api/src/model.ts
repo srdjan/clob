@@ -6,6 +6,12 @@ type Side = 'Buy' | 'Sell'
 type Status = 'Open' | 'Partial' | 'Completed' | 'Canceled'
 type Datetime = number // milliseconds
 
+type ParsedId = {
+  ticker: Ticker
+  side: Side
+  sequence: number
+}
+
 type Trader = {
   username: string
   password?: string
@@ -41,4 +47,4 @@ type Trade = {
 }
 type NoTrade = 'None'
 
-export { Ticker, Side, Order, OrderBook, Bids, Trade, Traders, NoTrade, Trader }
+export { Ticker, Side, Order, OrderBook, Bids, Trade, Traders, NoTrade, Trader, ParsedId }

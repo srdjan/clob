@@ -13,7 +13,7 @@ let emptyTrade: Trade = {
   message: `No Match - No Trade. Order placed!`
 }
 
-const findOrder = (id: number): Order => {
+const findOrder = (id: string): Order => {
   return Ob.getOrder(id)
 }
 
@@ -52,7 +52,6 @@ const bid = (
       `Market: Invalid order: ${order} state after trade ${trade} execution`
     )
   }
-  Ob.saveOrder(order)
 
   if (!trade) {
     log(`Market.match: No Trade, orderId: ${order.id}`)
@@ -61,7 +60,7 @@ const bid = (
   return trade
 }
 
-const cancel = (userName: string, id: number): boolean => {
+const cancel = (userName: string, id: string): boolean => {
   Traders.verify(userName)
 
   if (! Ob.cancelOrder(id)) {
