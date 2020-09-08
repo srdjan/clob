@@ -17,17 +17,11 @@ test('Complite a full match Buy trade', () => {
 })
 
 test.skip('Complite a partial match Sell trade', () => {
-  // let [_, buyOrder] = Market.bid('joe', 'Buy', 'TW', 10, 150)
-  // let [trade, sellOrder] = Market.bid('sue', 'Sell', 'TW', 10, 100)
+  // let buyTrade= Market.bid('joe', 'Buy', 'TW', 10, 150)
+  // let sellTrade = Market.bid('sue', 'Sell', 'TW', 10, 100)
 
-  // assert.equal(buyOrder.status, 'Complete')
-  // assert.equal(buyOrder.filledQuantity, 50)
-  // assert.equal(sellOrder.status, 'Complete')
-  // assert.equal(sellOrder.filledQuantity, 50)
-  // assert.equal(trade.price, 10)
-  // assert.equal(trade.quantity, 50)
-  // assert.equal(trade.buyOrderId, buyOrder.id)
-  // assert.equal(trade.sellOrderId, sellOrder.id)
+  // assert.equal(buyTrade.quantity, 50)
+  // assert.equal(sellTrade.quantity, 50)
 })
 
 test.run()

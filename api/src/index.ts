@@ -1,72 +1,73 @@
-import { Ticker, Order, Side } from './model'
+import { Ticker, Order, Side, Trade } from './model'
 import { seqGenerator, log } from './utils'
 import * as Ob from './orderbook'
 import * as Traders from './traders'
 
-function bid (
-  username: string,
-  ticker: Ticker,
+let emptyTrade: Trade = {
+  ticker: 'None',
+  price: 0,
+  quantity: 0,
+  buyOrderId: -1,
+  sellOrderId: -1,
+  createdAt: 0,
+  message: `No Match - No Trade. Order placed!`
+}
+
+const findOrder = (id: string): Order => {
+  return Ob.getOrder(id)
+}
+
+const bid = (
+  userName: string,
   side: Side,
+  ticker: Ticker,
   limit: number,
   quantity: number
-): string {
-  try {
-    let trader = Traders.getOrCreate(username)
+): Trade => {
+  let trader = Traders.getOrCreate(userName)
 
-    let order: Order = {
-      id: seqGenerator(),
-      trader: trader,
-      ticker: ticker,
-      side: side,
-      limit: limit,
-      quantity: quantity,
-      filledQuantity: 0,
-      status: 'Open',
-      createdAt: new Date().getTime()
-    }
-
-    // find if there are matching orders to execute
-    let trade = Ob.process(order)
-    if (!trade) {
-      return 'No matches, No Trade!'
-    }
-
-    if (trade.quantity < quantity) {
-      order.status = 'Open'
-      order.filledQuantity = quantity - trade.quantity
-    } else if (trade.quantity === quantity) {
-      order.status = 'Completed'
-      order.filledQuantity = quantity
-    } else {
-      log(`Market: Invalid order: ${order} state after trade ${trade} execution`)
-      throw new Error(
-        `Market: Invalid order: ${order} state after trade ${trade} execution`
-      )
-    }
-    return 'Success'
-  } catch (error) {
-    log(`Market: Error ${error}`)
-    return `This BID request has failed. Please try later`
+  // create order
+  let order: Order = {
+    id: seqGenerator(),
+    trader: trader,
+    ticker: ticker,
+    side: side,
+    limit: limit,
+    quantity: quantity,
+    filledQuantity: 0,
+    status: 'Open',
+    createdAt: new Date().getTime()
   }
-}
 
-function cancel (username: string, id: number): string {
-  try {
-    Traders.verify(username)
-
-    if (!Ob.cancelOrder(id)) {
-      throw new Error(`Markets: Order for id: ${id} not found`)
-    }
-    log(`Market: Order with id: ${id} canceled`)
-  } catch (error) {
-    log(`MArket: Error ${error}`)
-    return `This Cancel order has failed. Please try later`
+  // find if there are matching orders to execute
+  let trade = Ob.match(order)
+  if (trade.quantity < order.quantity) {
+    order.status = 'Open'
+    order.filledQuantity = order.quantity - trade.quantity
+  } else if (trade.quantity === order.quantity) {
+    order.status = 'Completed'
+    order.filledQuantity = order.quantity
+  } else {
+    throw new Error(
+      `Market: Invalid order: ${order} state after trade ${trade} execution`
+    )
   }
-  return 'Success'
+
+  if (!trade) {
+    log(`Market.match: No Trade, orderId: ${order.id}`)
+    return emptyTrade
+  }
+  return trade
 }
 
-const show = (ticker: string, top: number = 10): ['TODO'] | Error => {
-  throw Error('SHOW Not Implemented!')
+const cancel = (userName: string, id: string): boolean => {
+  Traders.verify(userName)
+
+  if (!Ob.cancelOrder(id)) {
+    throw new Error(`Markets: Order for id: ${id} not found`)
+  }
+  log(`Orderbooks: Order with id: ${id} canceled`)
+  return true
 }
 
-export default { bid, cancel, show }
+export { findOrder, bid, cancel }

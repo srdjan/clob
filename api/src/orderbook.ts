@@ -6,6 +6,7 @@ const sortAsc = (a:any, b:any) =>  (a[1].limit > b[1].limit && 1) || (a[1].limit
 const sortDsc = (a:any, b:any) =>  (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 
 function parseIdString(id: string) : ParsedId {
+  //todo: implement simple parser
   return {
     ticker: 'TW', 
     side: 'Buy', 
@@ -60,7 +61,7 @@ function setOrderBook(order: Order): Bids {
                             sell: new Map<number, Order>()
                           })
   }
-  
+
   let bids = OrderBook.get(order.ticker) as Bids
   if (order.side === 'Buy') {
     bids.buy.set(order.id, order)
