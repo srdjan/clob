@@ -6,7 +6,7 @@ import * as OrderId from '../../src/orderid'
 
 const test = suite('Test OrderBook')
 
-function makeOrder (
+function newOrder (
   trader: string,
   ticker: Ticker,
   side: Side,
@@ -27,7 +27,7 @@ function makeOrder (
 }
 
 test('make first Buy Order', () => {
-  let response = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 100))
+  let response = Ob.match(newOrder('joe', 'TW', 'Buy', 10, 100))
 
   assert.equal(response.order.ticker, 'TW')
   assert.equal(response.order.side, 'Buy')
@@ -36,7 +36,7 @@ test('make first Buy Order', () => {
 })
 
 test('make first Sell Order', () => {
-  let response = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 100))
+  let response = Ob.match(newOrder('joe', 'TW', 'Sell', 10, 100))
 
   assert.equal(response.order.ticker, 'TW')
   assert.equal(response.order.side, 'Sell')
@@ -45,55 +45,52 @@ test('make first Sell Order', () => {
 })
 
 test('cancel order', () => {
-  let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 100))
+  let buyResponse = Ob.match(newOrder('joe', 'TW', 'Buy', 10, 100))
   let buyOrder = Ob.getOrder(buyResponse.order.id)
   let canceledOrder = Ob.cancelOrder(buyOrder.id)
   assert.equal(canceledOrder, true)
 })
 
-test('Complite a full Buy trade', () => {
-  let sellResponse = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 100))
+test('Complete a full Buy trade', () => {
+  let sellResponse = Ob.match(newOrder('joe', 'TW', 'Sell', 10, 100))
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 
-  let buyResponse = Ob.match(makeOrder('sue', 'TW', 'Buy', 10, 100))
+  let buyResponse = Ob.match(newOrder('sue', 'TW', 'Buy', 10, 100))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 })
 
-test('Complite a full Sell trade', () => {
-  let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 100))
+test('Complete a full Sell trade', () => {
+  let buyResponse = Ob.match(newOrder('joe', 'TW', 'Buy', 10, 100))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
-  let sellResponse = Ob.match(makeOrder('sue', 'TW', 'Sell', 10, 100))
-  console.log(`sell order: ${JSON.stringify(sellResponse && sellResponse.order)}`)
+  let sellResponse = Ob.match(newOrder('sue', 'TW', 'Sell', 10, 100))
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 })
 
-test('Complite a partial Buy trade', () => {
-  let sellResponse = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 70))
-  assert.equal(sellResponse.order.limit, 10)
-  assert.equal(sellResponse.order.quantity, 70)
+test('Complete a partial Buy trade', () => {
+  let sellResponse = Ob.match(newOrder('joe', 'NET', 'Sell', 2000, 90))
+  assert.equal(sellResponse.order.limit, 2000)
+  assert.equal(sellResponse.order.quantity, 90)
   assert.equal(sellResponse.order.status, 'Open')
 
-  let buyResponse = Ob.match(makeOrder('sue', 'TW', 'Buy', 10, 100))
-  // console.log(`${JSON.stringify(buyResponse)}`)
-  assert.equal(buyResponse.order.limit, 10)
+  let buyResponse = Ob.match(newOrder('sue', 'NET', 'Buy', 2000, 100))
+  assert.equal(buyResponse.order.limit, 2000)
   assert.equal(buyResponse.order.quantity, 100)
-  assert.equal(buyResponse.order.filledQuantity, 70)
+  assert.equal(buyResponse.order.filledQuantity, 90)
   assert.equal(buyResponse.order.status, 'Partial')
 })
 
-test('Complite a partial Sell trade', () => {
-  let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 90))
+test('Complete a partial Sell trade', () => {
+  let buyResponse = Ob.match(newOrder('joe', 'T', 'Buy', 10, 90))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 90)
   assert.equal(buyResponse.order.status, 'Open')
 
-  let sellResponse = Ob.match(makeOrder('sue', 'TW', 'Sell', 10, 100))
-  console.log(`${JSON.stringify(sellResponse)}`)
+  let sellResponse = Ob.match(newOrder('sue', 'T', 'Sell', 10, 100))
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
   assert.equal(sellResponse.order.filledQuantity, 90)
@@ -101,12 +98,11 @@ test('Complite a partial Sell trade', () => {
 })
 
 test('Fail a self trade', () => {
-  let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 100))
+  let buyResponse = Ob.match(newOrder('joe', 'TW', 'Buy', 10, 100))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
-  let sellResponse = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 100))
-
+  let sellResponse = Ob.match(newOrder('joe', 'TW', 'Sell', 10, 100))
   assert.equal(sellResponse.trade.message, 'Fail')
 })
 
