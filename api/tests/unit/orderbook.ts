@@ -1,8 +1,8 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 import * as Ob from '../../src/orderbook'
-import { Order, Side, Ticker } from '../../src/model'
-import * as OrderId from '../../src/orderid'
+import { IOrder, Side, Ticker } from '../../src/model'
+import {Order} from '../../src/order'
 
 const test = suite('Test OrderBook')
 
@@ -12,18 +12,8 @@ function newOrder (
   side: Side,
   limit: number,
   quantity: number
-): Order {
-  return {
-    id: OrderId.createAsString(ticker, side),
-    trader: { username: trader },
-    ticker: ticker,
-    side: side,
-    limit: limit,
-    quantity: quantity,
-    filledQuantity: 0,
-    status: 'Open',
-    createdAt: new Date().getTime()
-  }
+): IOrder {
+  return new Order({ username: trader }, ticker, side, limit, quantity)
 }
 
 test('make first Buy Order', () => {

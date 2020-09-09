@@ -1,6 +1,6 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
-import Clob from '../../src/index'
+import * as Clob from '../../src/index'
 
 const test = suite('test')
 

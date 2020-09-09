@@ -1,6 +1,6 @@
 type Money = number //todo: in cents, but will require higher precision
 type Quantity = number
-type Datetime = number // milliseconds
+type Timestamp = number // milliseconds
 
 type Result<T> = {
   outcome: boolean
@@ -10,8 +10,5 @@ type Result<T> = {
 
 const log = console.log //todo: replace with real logger after v0.1
 
-// keep it simple 
-let currentID: number = 0
-const seqGenerator = () => currentID++
 
-export { Money, Quantity, Datetime, Result, log, seqGenerator } 
+export { Money, Quantity, Timestamp, Result, log } 

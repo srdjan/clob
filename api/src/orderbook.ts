@@ -1,28 +1,16 @@
-import { Order, OrderBook, Orders, OrderHistory, Ticker, MarketResponse } from './model'
-import { fromString, createAsString } from './orderid'
+import { IOrder, OrderBook, LiveOrders, Ticker, MarketResponse } from './model'
+import { getEmptyOrder } from './order'
+import OrderId from './orderid'
 import { log } from './utils'
 
-const emptyOrder: Order = {
-  id: createAsString('None', 'None'),
-  trader: {username: '', password: ''},
-  ticker: 'None',
-  side: 'None',
-  limit: 0,
-  quantity: 0,
-  filledQuantity: 0,
-  status: 'None',
-  createdAt: new Date ().getTime()
-}
-
-const OrderHistory= new Map<string, Order>()
-const OrderBook: OrderBook = new Map<Ticker, Orders>()
+const OrderBook: OrderBook = new Map<Ticker, LiveOrders>()
 const sortAsc = (a: any, b: any) =>
   (a[1].limit > b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 const sortDsc = (a: any, b: any) =>
   (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 
-const getOrder = (id: string): Order => {
-  let orderId = fromString(id) //validate
+const getOrder = (id: string): IOrder => {
+  let orderId = OrderId.fromString(id) //validate
   let orderBook = OrderBook.get(orderId.ticker)
   if (!orderBook) {
     throw new Error(`Orderbook.getOrder: Orders for ticker: ${orderId.ticker} not found`)
@@ -41,14 +29,12 @@ function cancelOrder (id: string): boolean {
     throw new Error(`Orderbook.cancelOrder: Order for id:${id} not found`)
   }
   
-  order.status = 'Canceled'
-  OrderHistory.set(order.id, order)
-  
-  deleteOrder(order) 
+  order.cancel()
+  deleteFromOrderBook(order) 
   return true
 }
 
-function deleteOrder(order: Order): void {
+function deleteFromOrderBook(order: IOrder): void {
   let orderBook = OrderBook.get(order.ticker)
   if (!orderBook) {
     throw new Error(`Orderbook.deleteOrder: OrderBook for ticker:${order.ticker} not found`)
@@ -66,46 +52,44 @@ function deleteOrder(order: Order): void {
    } 
 }
 
-function updateOrder (order: Order): Orders {
-  OrderHistory.set(order.id, order)
+function updateOrder (order: IOrder): LiveOrders {
+  order.update()
 
-  let orders = OrderBook.get(order.ticker) as Orders
-  if (orders && order.side === 'Buy') {
-    orders.buy.set(order.id, order)
+  let liveOrders = OrderBook.get(order.ticker) as LiveOrders
+  if (liveOrders && order.side === 'Buy') {
+    liveOrders.buy.set(order.id, order)
   }
 
-  if (orders && order.side === 'Sell') {
-    orders.sell.set(order.id, order)
+  if (liveOrders && order.side === 'Sell') {
+    liveOrders.sell.set(order.id, order)
   }
 
-  return orders
+  return liveOrders
 }
 
-function insertOrder (order: Order): Orders {
-  OrderHistory.set(order.id, order)
-
-  let orders = OrderBook.get(order.ticker) as Orders
-  if (orders && order.side === 'Buy') {
-    orders.buy.set(order.id, order)
-    let sorted = new Map([...orders.buy].sort(sortAsc))
-    orders.buy = sorted
+function insertOrder (order: IOrder): LiveOrders {
+  let liveOrders = OrderBook.get(order.ticker) as LiveOrders
+  if (liveOrders && order.side === 'Buy') {
+    liveOrders.buy.set(order.id, order)
+    let sorted = new Map([...liveOrders.buy].sort(sortAsc))
+    liveOrders.buy = sorted
   }
 
-  if (orders && order.side === 'Sell') {
-    orders.sell.set(order.id, order)
-    let sorted = new Map([...orders.sell].sort(sortDsc))
-    orders.sell = sorted
+  if (liveOrders && order.side === 'Sell') {
+    liveOrders.sell.set(order.id, order)
+    let sorted = new Map([...liveOrders.sell].sort(sortDsc))
+    liveOrders.sell = sorted
   }
 
-   return orders
+   return liveOrders
 }
 
-function match (order: Order): MarketResponse {
+function match (order: IOrder): MarketResponse {
   if (!OrderBook.has(order.ticker)) {
     log(`Orderbook.match: initiate new OrderBook for ticker: ${order.ticker}`)
     OrderBook.set(order.ticker, {
-      buy: new Map<string, Order>(),
-      sell: new Map<string, Order>()
+      buy: new Map<string, IOrder>(),
+      sell: new Map<string, IOrder>()
     })
   }
 
@@ -131,9 +115,8 @@ function match (order: Order): MarketResponse {
     return { order, trade }
   }
 
-  log(`Orderbook.match: order quantity ${order.quantity}, matchOrder quantity: ${matchOrder.quantity}`)
   let quantity = order.quantity > matchOrder.quantity ? matchOrder.quantity : order.quantity
-  log(`Orderbook.match: order quantity ${quantity}`)
+  log(`Orderbook.match: before: order quantity ${order.quantity}, matchOrder quantity: ${matchOrder.quantity}, after: order quantity ${quantity}`)
 
   trade.price = matchOrder.limit
   trade.quantity = quantity
@@ -165,36 +148,36 @@ function match (order: Order): MarketResponse {
   return { order, trade }
 }
 
-function getMatchOrder (order: Order, orders: Orders): Order {
+function getMatchOrder (order: IOrder, liveOrders: LiveOrders): IOrder {
   if (order.side === 'Buy') {
-    if (orders.sell.size === 0) {
+    if (liveOrders.sell.size === 0) {
       log(`Orderbook.getMatchOrder: no BUY trade possible: no SELL side orders`)
-      return emptyOrder
+      return order
     }
-    let matchOrder = orders.sell.entries().next().value[1]
+    let matchOrder = liveOrders.sell.entries().next().value[1]
     if (matchOrder.status === 'Open' && matchOrder.limit <= order.limit) {
       log(`Orderbook.getMatchOrder: MATCH order on the SELL side found`)
       return matchOrder // there are sellers at given or better price
     }
     log(`Orderbook.getMatchOrder : no MATCH order on the SELL side found`)
-    return emptyOrder
+    return order
   }
 
   if (order.side === 'Sell') {
-    if (orders.buy.size === 0) {
+    if (liveOrders.buy.size === 0) {
       log(`Orderbook.getMatchOrder: no SELL trade possible: no BUY sideeorders`)
-      return emptyOrder
+      return order
     }
-    let matchingOrder = orders.buy.entries().next().value[1]
+    let matchingOrder = liveOrders.buy.entries().next().value[1]
     if (matchingOrder.status === 'Open' && matchingOrder.limit >= order.limit) {
       log(`Orderbook.getMatchOrder: MATCH order on the BUY side found`)
       return matchingOrder // there are buyers at given or better price
     }
     log(`Orderbook.getMatchOrder : no MATCH order on the BUY side found`)
-    return emptyOrder
+    return order
   }
 
-  return emptyOrder
+  return getEmptyOrder()
 }
 
 export { getOrder, match, cancelOrder }

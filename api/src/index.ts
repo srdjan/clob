@@ -1,12 +1,13 @@
-import { Ticker, Order, Side } from './model'
-import * as Ob from './orderbook'
+import {Order} from './order'
+import {Ticker, Side} from './model'
+import * as OrderBook from './orderbook'
 import * as Traders from './traders'
-import * as OrderId from './orderid'
 import {log} from './utils'
+import OrderHistory from './orderHistory'
 
 const findOrder = (id: string): string => {
   try {
-    return JSON.stringify(Ob.getOrder(id))
+    return JSON.stringify(OrderBook.getOrder(id))
   }
   catch(e) {
     log(`Market.findOrder: unexpected error, orderId: ${id}`)
@@ -23,22 +24,13 @@ const bid = (
 ): string => {
   let trader = Traders.getOrCreate(userName)
 
-  // create order
-  let order: Order = {
-    id: OrderId.createAsString(ticker as Ticker, side as Side),
-    trader: trader,
-    ticker: ticker as Ticker,
-    side: side as Side,
-    limit: limit,
-    quantity: quantity,
-    filledQuantity: 0,
-    status: 'Open',
-    createdAt: new Date().getTime()
-  }
-
+  // create and save order
+  let order = new Order(trader, ticker as Ticker, side as Side, limit, quantity)
+  OrderHistory.push(order)
+  
   // Save incoming order and find if there are matching orders to execute
   try {
-    let response = Ob.match(order)
+    let response = OrderBook.match(order)
       if (!response.trade) {
       log(`Market.bid: No Trade, orderId: ${order.id}`)
     }
@@ -55,7 +47,7 @@ const cancel = (userName: string, id: string): string => {
   try {
     Traders.verify(userName)
 
-    if (!Ob.cancelOrder(id)) {
+    if (!OrderBook.cancelOrder(id)) {
       throw new Error(`Market.cancel: Order for id: ${id} not found`)
     }
     log(`Market.cancel: Order with id: ${id} canceled`)
