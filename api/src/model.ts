@@ -18,7 +18,7 @@ type Traders = Map<string, Trader>
 
 type Order = {
   id: string
-  trader?: Trader
+  trader: Trader
   ticker: Ticker
   side: Side
   limit: Money
@@ -46,7 +46,7 @@ type Trade = {
 
 type MarketResponse = {
   order: Order,
-  trade?: Trade
+  trade: Trade
 }
 
 export { Ticker, Side, Order, OrderBook, Bids, Trade, Traders, Trader, OrderId, MarketResponse }

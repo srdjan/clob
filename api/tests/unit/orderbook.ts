@@ -1,7 +1,7 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 import * as Ob from '../../src/orderbook'
-import { Order, Side, Ticker, Trader } from '../../src/model'
+import { Order, Side, Ticker } from '../../src/model'
 import * as OrderId from '../../src/orderid'
 
 const test = suite('Test OrderBook')
@@ -47,30 +47,22 @@ test('make first Sell Order', () => {
 test('cancel order', () => {
   let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 100))
   let buyOrder = Ob.getOrder(buyResponse.order.id)
-  console.log(`buy order: ${JSON.stringify(buyOrder)}`)
-
-  // let cancelResponse = Ob.cancelOrder(buyOrder.id)
-  // assert.equal(cancelResponse, true)
-
-  // let canceledOrder = Ob.getOrder(buyResponse.order.id)
-  // assert.equal(canceledOrder.status, 'Canceled')
+  let canceledOrder = Ob.cancelOrder(buyOrder.id)
+  assert.equal(canceledOrder, true)
 })
 
 test('Complite a full Buy trade', () => {
   let sellResponse = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 100))
-  console.log(`buy order: ${JSON.stringify(sellResponse.order)}`)
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 
   let buyResponse = Ob.match(makeOrder('sue', 'TW', 'Buy', 10, 100))
-  console.log(`sell trade: ${JSON.stringify(buyResponse && buyResponse.order)}`)
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 })
 
 test('Complite a full Sell trade', () => {
   let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 100))
-  console.log(`buy order: ${JSON.stringify(buyResponse.order)}`)
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
@@ -80,28 +72,42 @@ test('Complite a full Sell trade', () => {
   assert.equal(sellResponse.order.quantity, 100)
 })
 
-test.skip('Complite a partial Buy trade', () => {
-  let sellResponse = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 100))
-  console.log(`sell order: ${JSON.stringify(sellResponse.order)}`)
+test('Complite a partial Buy trade', () => {
+  let sellResponse = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 70))
   assert.equal(sellResponse.order.limit, 10)
-  assert.equal(sellResponse.order.quantity, 100)
+  assert.equal(sellResponse.order.quantity, 70)
+  assert.equal(sellResponse.order.status, 'Open')
 
-  let buyResponse = Ob.match(makeOrder('sue', 'TW', 'Buy', 10, 80))
-  console.log(`sell trade: ${JSON.stringify(buyResponse && buyResponse.order)}` )
+  let buyResponse = Ob.match(makeOrder('sue', 'TW', 'Buy', 10, 100))
+  // console.log(`${JSON.stringify(buyResponse)}`)
   assert.equal(buyResponse.order.limit, 10)
-  assert.equal(buyResponse.order.quantity, 80)
+  assert.equal(buyResponse.order.quantity, 100)
+  assert.equal(buyResponse.order.filledQuantity, 70)
+  assert.equal(buyResponse.order.status, 'Partial')
 })
 
-test.skip('Complite a partial Sell trade', () => {
+test('Complite a partial Sell trade', () => {
+  let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 90))
+  assert.equal(buyResponse.order.limit, 10)
+  assert.equal(buyResponse.order.quantity, 90)
+  assert.equal(buyResponse.order.status, 'Open')
+
+  let sellResponse = Ob.match(makeOrder('sue', 'TW', 'Sell', 10, 100))
+  console.log(`${JSON.stringify(sellResponse)}`)
+  assert.equal(sellResponse.order.limit, 10)
+  assert.equal(sellResponse.order.quantity, 100)
+  assert.equal(sellResponse.order.filledQuantity, 90)
+  assert.equal(sellResponse.order.status, 'Partial')
+})
+
+test('Fail a self trade', () => {
   let buyResponse = Ob.match(makeOrder('joe', 'TW', 'Buy', 10, 100))
-  console.log(`buy trade: ${JSON.stringify(buyResponse)}`)
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
-  let sellResponse = Ob.match(makeOrder('sue', 'TW', 'Sell', 10, 80))
-  console.log(`sell trade: ${JSON.stringify(sellResponse && sellResponse.order)}`)
-  assert.equal(sellResponse.order.limit, 10)
-  assert.equal(sellResponse.order.quantity, 80)
+  let sellResponse = Ob.match(makeOrder('joe', 'TW', 'Sell', 10, 100))
+
+  assert.equal(sellResponse.trade.message, 'Fail')
 })
 
 test.run()
