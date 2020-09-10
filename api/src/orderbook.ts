@@ -1,8 +1,7 @@
 import { IOrder, OrderBook, MarketResponse, Ticker, Trade } from './model'
 import { getEmptyOrder } from './order'
 import * as OrderBooks from './orderbooks'
-import { log } from './utils'
-import { performance } from 'perf_hooks'
+import { log, TradeId } from './utils'
 
 function match (order: IOrder): MarketResponse {
   let trades = new Array<Trade>()
@@ -53,7 +52,9 @@ function match (order: IOrder): MarketResponse {
     log(`\n\nOrderbook.match: updated order ${JSON.stringify(order)}`)
     OrderBooks.updateOrder(orderBook, matchOrder)
     log(`\n\nOrderbook.match: updated matchOrder ${JSON.stringify(matchOrder)}`)
-    
+
+    //todo: need to filter orders with status: 'canceled' 
+    // or remove them (?) (as long as they are in order history):
     // if(matchOrder.quantity >= matchOrder.filledQuantity) {
     //   OrderBooks.removeOrder(orderBook, matchOrder)
     // }
@@ -73,10 +74,8 @@ function getMatching (order: IOrder, orderBook: OrderBook): IOrder | undefined {
       log(`Orderbook.getMatching: FOUND MATCH order on the SELL side`)
       return matchOrder // there are sellers at given or better price
     }
-    log(`Orderbook.getMatching : no MATCH order on the SELL side found`)
   }
-
-  if (order.side === 'Sell') {
+  else if (order.side === 'Sell') {
     if (orderBook.buySide.size === 0) {
       log(`Orderbook.getMatching: no BUY sidee orders`)
       return undefined
@@ -86,30 +85,21 @@ function getMatching (order: IOrder, orderBook: OrderBook): IOrder | undefined {
       log(`Orderbook.getMatching: FOUND MATCH order on the BUY side`)
       return matchOrder // there are buyers at given or better price
     }
-    log(`Orderbook.getMatching: no MATCH order on the BUY side found`)
   }
 
+  log(`Orderbook.getMatching : no MATCH order on the ${order.side} side found`)
   return undefined
 }
 
-function getEmptyTrade(ticker: Ticker) {
+function getEmptyTrade(ticker: Ticker): Trade {
   return {
     ticker: ticker,
     price: 0,
     quantity: 0,
     buyOrder: getEmptyOrder(),
     sellOrder: getEmptyOrder(),
-    createdAt: Number(performance.now().toString(0)),//new Date().getTime(),
+    createdAt: TradeId.next(),//new Date().getTime(),
     message: 'Fail'
-  }
-}
-
-//todo: extract
-class SeqGen {
-  static sequence = 0
-  
-  static next (): number {
-    return SeqGen.sequence + 10
   }
 }
 

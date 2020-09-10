@@ -25,7 +25,7 @@ interface IOrder {
   quantity: Quantity
   filledQuantity: Quantity
   status: Status
-  createdAt: Timestamp
+  createdAt: number
   cancel (): void
   update(): void
   complete (): void

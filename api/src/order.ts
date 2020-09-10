@@ -1,6 +1,6 @@
 import { IOrder, Ticker, Trader, Side, Status } from './model'
 import OrderId from './orderid'
-import { Money, Quantity, Timestamp } from './utils'
+import { Money, Quantity, SeqGen, Timestamp } from './utils'
 import OrderHistory from './orderHistory'
 // import { performance } from 'perf_hooks'
 
@@ -30,7 +30,7 @@ class Order implements IOrder {
     this.quantity = quantity
     this.filledQuantity = 0
     this.status = 'Open'
-    this.createdAt = 1//performance.now()//new Date().getTime()
+    this.createdAt = SeqGen.next()//performance.now()//new Date().getTime()
   }
 
   cancel (): void {
