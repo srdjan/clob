@@ -12,4 +12,4 @@ test('create', () => {
   assert.equal(orderId.side, 'Buy')
 })
 
-test  .run()
+test.run()

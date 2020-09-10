@@ -61,4 +61,8 @@ function getOrders (ticker: string): IOrder[] {
   return Array.from(OrderBooks.getOrders(ticker as Ticker))
 }
 
-export { findOrder, bid, cancel, getOrders }
+function clearAll(): void {
+  OrderBooks.clearAll()
+}
+
+export { findOrder, bid, cancel, getOrders, clearAll }

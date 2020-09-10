@@ -18,7 +18,7 @@ test('verify: success', () => {
 })
 
 test('verify: fail', () => {
-  Traders.getOrCreate('joe')
+  Traders.getOrCreate('tom')
   assert.throws(() => Traders.verify('sam'))
 })
 

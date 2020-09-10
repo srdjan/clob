@@ -105,4 +105,9 @@ function getOrders (ticker: Ticker): IOrder[] {
   let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
   return sorted
 }
-export { getOrders, getOrder, insertOrder, updateOrder, cancelOrder }
+
+function clearAll(): void {
+  OrderBooks.clear()
+}
+
+export { getOrders, getOrder, insertOrder, updateOrder, cancelOrder, clearAll }

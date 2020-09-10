@@ -10,7 +10,9 @@ test1('A single valid order is accepted into the limit order book Given an empty
   
   assert.equal(result.order.ticker, 'TW')
   assert.equal(result.order.trader.username, 'trader1')
+
 })
+test1.after(() => Clob.clearAll())
 test1.run()
 
 const test2 = suite('Acceptance test2')
@@ -42,6 +44,7 @@ test2('Multiple valid orders are accepted into the limit order book Given an emp
   assert.equal(orderBook[0].status, 'Open')
   assert.equal(orderBook[1].status, 'Open')
 })
+test2.after(() => Clob.clearAll())
 test2.run()
 
 const test3 = suite('Acceptance test3')
@@ -70,7 +73,8 @@ test3('Two tradable orders result in a trade Given an empty orderbook for "TW"',
   assert.equal(orderBook[0].filledQuantity, 100)
   assert.equal(orderBook[1].filledQuantity, 100)
 
-  assert.equal(orderBook[0].status, 'Complete')
-  assert.equal(orderBook[1].status, 'Complete')
+  assert.equal(orderBook[0].status, 'Completed')
+  assert.equal(orderBook[1].status, 'Completed')
 })
+test3.after(() => Clob.clearAll())
 test3.run()

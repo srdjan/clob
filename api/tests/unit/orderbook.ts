@@ -5,8 +5,6 @@ import * as OrderBook from '../../src/orderbook'
 import { IOrder, Side, Ticker } from '../../src/model'
 import {Order} from '../../src/order'
 
-const test = suite('Test OrderBook')
-
 function newOrder (
   trader: string,
   ticker: Ticker,
@@ -17,7 +15,8 @@ function newOrder (
   return new Order({ username: trader }, ticker, side, limit, quantity)
 }
 
-test('make first Buy Order', () => {
+const test1 = suite('Test OrderBook')
+test1('make first Buy Order', () => {
   let response = OrderBook.match(newOrder('joe', 'TW', 'Buy', 10, 100))
 
   assert.equal(response.order.ticker, 'TW')
@@ -25,8 +24,11 @@ test('make first Buy Order', () => {
   assert.equal(response.order.limit, 10)
   assert.equal(response.order.quantity, 100)
 })
+test1.after(() => OrderBooks.clearAll())
+test1.run()
 
-test('make first Sell Order', () => {
+const test2 = suite()
+test2('make first Sell Order', () => {
   let response = OrderBook.match(newOrder('joe', 'TW', 'Sell', 10, 100))
 
   assert.equal(response.order.ticker, 'TW')
@@ -34,15 +36,21 @@ test('make first Sell Order', () => {
   assert.equal(response.order.limit, 10)
   assert.equal(response.order.quantity, 100)
 })
+test2.after(() => OrderBooks.clearAll())
+test2.run()
 
-test('cancel order', () => {
+const test3 = suite()
+test3('cancel order', () => {
   let buyResponse = OrderBook.match(newOrder('joe', 'TW', 'Buy', 10, 100))
   let buyOrder = OrderBooks.getOrder(buyResponse.order.id)
   let canceledOrder = OrderBooks.cancelOrder(buyOrder.id)
   assert.equal(canceledOrder, true)
 })
+test3.after(() => OrderBooks.clearAll())
+test3.run()
 
-test('Complete a full Buy trade', () => {
+const test4 = suite()
+test4('Complete a full Buy trade', () => {
   let sellResponse = OrderBook.match(newOrder('joe', 'TW', 'Sell', 10, 100))
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
@@ -51,8 +59,11 @@ test('Complete a full Buy trade', () => {
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 })
+test4.after(() => OrderBooks.clearAll())
+test4.run()
 
-test('Complete a full Sell trade', () => {
+const test5 = suite()
+test5('Complete a full Sell trade', () => {
   let buyResponse = OrderBook.match(newOrder('joe', 'TW', 'Buy', 10, 100))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
@@ -61,8 +72,11 @@ test('Complete a full Sell trade', () => {
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 })
+test5.after(() => OrderBooks.clearAll())
+test5.run()
 
-test('Complete a partial Buy trade', () => {
+const test6 = suite()
+test6('Complete a partial Buy trade', () => {
   let sellResponse = OrderBook.match(newOrder('joe', 'NET', 'Sell', 2000, 90))
   assert.equal(sellResponse.order.limit, 2000)
   assert.equal(sellResponse.order.quantity, 90)
@@ -74,8 +88,11 @@ test('Complete a partial Buy trade', () => {
   assert.equal(buyResponse.order.filledQuantity, 90)
   assert.equal(buyResponse.order.status, 'Partial')
 })
+test6.after(() => OrderBooks.clearAll())
+test6.run()
 
-test('Complete a partial Sell trade', () => {
+const test7 = suite()
+test7('Complete a partial Sell trade', () => {
   let buyResponse = OrderBook.match(newOrder('joe', 'T', 'Buy', 10, 90))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 90)
@@ -87,8 +104,11 @@ test('Complete a partial Sell trade', () => {
   assert.equal(sellResponse.order.filledQuantity, 90)
   assert.equal(sellResponse.order.status, 'Partial')
 })
+test7.after(() => OrderBooks.clearAll())
+test7.run()
 
-test('Fail a self trade', () => {
+const test8 = suite()
+test8('Fail a self trade', () => {
   let buyResponse = OrderBook.match(newOrder('joe', 'TW', 'Buy', 10, 100))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
@@ -96,5 +116,5 @@ test('Fail a self trade', () => {
   let sellResponse = OrderBook.match(newOrder('joe', 'TW', 'Sell', 10, 100))
   assert.equal(sellResponse.trade.message, 'Fail')
 })
-
-test.run()
+test8.after(() => OrderBooks.clearAll())
+test8.run()
