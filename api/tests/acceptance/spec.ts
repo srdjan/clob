@@ -3,17 +3,18 @@ import * as assert from 'uvu/assert'
 import * as Clob from '../../src/index'
 import {MarketResponse} from '../../src/model'
 
-const test = suite('Acceptance test')
-
-test('A single valid order is accepted into the limit order book Given an empty orderbook for "TW"', () => {
+const test1 = suite('Acceptance test1')
+test1('A single valid order is accepted into the limit order book Given an empty orderbook for "TW"', () => {
   let response = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
   let result = JSON.parse(response) as MarketResponse
   
   assert.equal(result.order.ticker, 'TW')
   assert.equal(result.order.trader.username, 'trader1')
 })
+test1.run()
 
-test('Multiple valid orders are accepted into the limit order book Given an empty orderbook for "TW"', () => {
+const test2 = suite('Acceptance test2')
+test2('Multiple valid orders are accepted into the limit order book Given an empty orderbook for "TW"', () => {
   let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
   let response2 = Clob.bid('trader2', 'TW', 'Sell', 9960, 200)
   let orderBook = Clob.getOrders('TW')
@@ -41,8 +42,10 @@ test('Multiple valid orders are accepted into the limit order book Given an empt
   assert.equal(orderBook[0].status, 'Open')
   assert.equal(orderBook[1].status, 'Open')
 })
+test2.run()
 
-test('Two tradable orders result in a trade Given an empty orderbook for "TW"', () => {
+const test3 = suite('Acceptance test3')
+test3('Two tradable orders result in a trade Given an empty orderbook for "TW"', () => {
   let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
   let response2 = Clob.bid('trader2', 'TW', 'Sell', 9950, 100)
   let orderBook = Clob.getOrders('TW')
@@ -70,5 +73,4 @@ test('Two tradable orders result in a trade Given an empty orderbook for "TW"', 
   assert.equal(orderBook[0].status, 'Complete')
   assert.equal(orderBook[1].status, 'Complete')
 })
-
-test.run()
+test3.run()

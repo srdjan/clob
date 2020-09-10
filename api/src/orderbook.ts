@@ -16,7 +16,7 @@ function match (order: IOrder): MarketResponse {
     message: 'Fail'
   }
 
-  let matchOrder = getMatchOrder(order, orders)
+  let matchOrder = getMatching(order, orders)
   if (matchOrder.status === 'None') {
     log(`Orderbook.match: no trade possible: NO matching order`)
     return { order, trade }
@@ -57,7 +57,7 @@ function match (order: IOrder): MarketResponse {
   return { order, trade }
 }
 
-function getMatchOrder (order: IOrder, bookOrder: OrderBook): IOrder {
+function getMatching (order: IOrder, bookOrder: OrderBook): IOrder {
   if (order.side === 'Buy') {
     if (bookOrder.sellSide.size === 0) {
       log(`Orderbook.getMatchOrder: no BUY trade possible: no SELL side orders`)

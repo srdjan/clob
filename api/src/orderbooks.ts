@@ -1,5 +1,4 @@
-import { IOrder, OrderBooks, OrderBook, Ticker, MarketResponse } from './model'
-import { getEmptyOrder } from './order'
+import { IOrder, OrderBooks, OrderBook, Ticker } from './model'
 import OrderId from './orderid'
 import { log } from './utils'
 
@@ -9,9 +8,6 @@ const sortAscByLimit = (a: any, b: any) =>
   (a[1].limit > b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 const sortDscByLimit = (a: any, b: any) =>
   (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
-const sortDscByTimestamp = (a: any, b: any) =>
-  (a[1].createdAt < b[1].createdAt && 1) ||
-  (a[1].createdAt === b[1].createdAt ? 0 : -1)
 
 const getOrder = (id: string): IOrder => {
   let orderId = OrderId.fromString(id) //validate
@@ -37,13 +33,8 @@ function cancelOrder (id: string): boolean {
   if (!order) {
     throw new Error(`Orderbook.cancelOrder: Order for id:${id} not found`)
   }
-
   order.cancel()
-  deleteOrder(order)
-  return true
-}
 
-function deleteOrder (order: IOrder): void {
   let orderBook = OrderBooks.get(order.ticker)
   if (!orderBook) {
     throw new Error(
@@ -60,6 +51,7 @@ function deleteOrder (order: IOrder): void {
     let sorted = new Map([...orderBook.sellSide].sort(sortDscByLimit))
     orderBook.sellSide = sorted
   }
+  return true
 }
 
 function updateOrder (order: IOrder): OrderBook {
@@ -111,9 +103,6 @@ function getOrders (ticker: Ticker): IOrder[] {
   }
   let merged = Array.from(orderBook.buySide.values()).concat(Array.from(orderBook.sellSide.values()))
   let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
-
-  log(`\n\SORTED book: ${JSON.stringify(sorted)}`)
-
   return sorted
 }
 export { getOrders, getOrder, insertOrder, updateOrder, cancelOrder }
