@@ -109,23 +109,11 @@ function getOrders (ticker: Ticker): IOrder[] {
       `Orderbook.getOrderBook: Orders for ticker: ${ticker} not found`
     )
   }
-  let buyArray = Array.from(orderBook.buySide.values())
-  let sellArray = Array.from(orderBook.sellSide.values())
+  let merged = Array.from(orderBook.buySide.values()).concat(Array.from(orderBook.sellSide.values()))
+  let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
 
-  // let merged = new Array([...Array.from(buyArray.values()), ...Array.from(sellArray.values())])
-  // let merged = [...Array.from(buyArray).concat(...Array.from(sellArray))]
-  let merged = buyArray.concat(...sellArray)
-  log(`\n\nMERGED: ${JSON.stringify(merged)}`)
+  log(`\n\SORTED book: ${JSON.stringify(sorted)}`)
 
-  // let sorted = [...merged.values()].sort(sortDscByTimestamp)
-  let sorted = Array.from(merged.entries()).sort(sortDscByLimit)
-
-  log(`\n\SORTED book: ${JSON.stringify(sorted.entries())}`)
-
-  return Array.from([])
-  // let buys = new Map([...orderBook?.buy].sort(sortDscByTimestamp))
-  // let sells = new Map([...orderBook?.sell].sort(sortDscByTimestamp))
-  // let mergedMap = new Map([...Array.from(buys.entries()), ...Array.from(sells.entries())]);
-  // let array = Array.from(mergedMap.values())
+  return sorted
 }
 export { getOrders, getOrder, insertOrder, updateOrder, cancelOrder }

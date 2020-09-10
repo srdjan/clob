@@ -13,20 +13,62 @@ test('A single valid order is accepted into the limit order book Given an empty 
   assert.equal(result.order.trader.username, 'trader1')
 })
 
-test.only('Multiple valid orders are accepted into the limit order book Given an empty orderbook for "TW"', () => {
+test('Multiple valid orders are accepted into the limit order book Given an empty orderbook for "TW"', () => {
   let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
   let response2 = Clob.bid('trader2', 'TW', 'Sell', 9960, 200)
   let orderBook = Clob.getOrders('TW')
-
+  console.log(`\n\ORDERBOOK: ${JSON.stringify(orderBook)}`)
   assert.equal(orderBook.length, 2)
+
+  assert.equal(orderBook[0].ticker, 'TW')
+  assert.equal(orderBook[1].ticker, 'TW')
+
+  assert.equal(orderBook[0].trader.username, 'trader1')
+  assert.equal(orderBook[1].trader.username, 'trader2')
+
+  assert.equal(orderBook[0].side, 'Buy')
+  assert.equal(orderBook[1].side, 'Sell')
+
+  assert.equal(orderBook[0].limit, 9950)
+  assert.equal(orderBook[1].limit, 9960)
+
+  assert.equal(orderBook[0].quantity, 100)
+  assert.equal(orderBook[1].quantity, 200)
+
+  assert.equal(orderBook[0].filledQuantity, 0)
+  assert.equal(orderBook[1].filledQuantity, 0)
+
+  assert.equal(orderBook[0].status, 'Open')
+  assert.equal(orderBook[1].status, 'Open')
 })
 
-test('Cancel', () => {
-  let response = Clob.bid('traderjoe', 'TW', 'Buy', 10000, 10)
-  let order = JSON.parse(response)
+test('Two tradable orders result in a trade Given an empty orderbook for "TW"', () => {
+  let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
+  let response2 = Clob.bid('trader2', 'TW', 'Sell', 9950, 100)
+  let orderBook = Clob.getOrders('TW')
 
-  response = Clob.cancel(order.username, order.id)
-  assert.equal(response, 'This Cancel order has failed. Please try later')
+  assert.equal(orderBook.length, 2)
+
+  assert.equal(orderBook[0].ticker, 'TW')
+  assert.equal(orderBook[1].ticker, 'TW')
+
+  assert.equal(orderBook[0].trader.username, 'trader1')
+  assert.equal(orderBook[1].trader.username, 'trader2')
+
+  assert.equal(orderBook[0].side, 'Buy')
+  assert.equal(orderBook[1].side, 'Sell')
+
+  assert.equal(orderBook[0].limit, 9950)
+  assert.equal(orderBook[1].limit, 9950)
+
+  assert.equal(orderBook[0].quantity, 100)
+  assert.equal(orderBook[1].quantity, 100)
+
+  assert.equal(orderBook[0].filledQuantity, 100)
+  assert.equal(orderBook[1].filledQuantity, 100)
+
+  assert.equal(orderBook[0].status, 'Complete')
+  assert.equal(orderBook[1].status, 'Complete')
 })
 
 test.run()
