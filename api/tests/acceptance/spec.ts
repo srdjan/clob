@@ -179,15 +179,3 @@ test5('A valid single order is able to sweep the book Given an empty orderbook f
 test5.after(() => Clob.clearAll())
 test5.run()
 
-const test6 = suite('Order id creation')
-test6.skip('check Id creation"',
-  () => {
-    let response = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
-    console.log(`\n\nRESPONSE: ${JSON.stringify(response)}`)
-    let {order, trade} = JSON.parse(response)
-
-    // assert.equal(order.id, 1)
-  }
-)
-test6.after(() => Clob.clearAll())
-test6.run()
