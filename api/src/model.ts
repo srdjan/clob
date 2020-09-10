@@ -41,8 +41,8 @@ type Trade = {
   ticker: Ticker
   price: Money
   quantity: Quantity
-  buyOrderId: string
-  sellOrderId: string
+  buyOrder: IOrder
+  sellOrder: IOrder
   createdAt: Timestamp
   message: string
 }

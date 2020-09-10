@@ -51,8 +51,8 @@ const test3 = suite('Acceptance test3')
 test3('Two tradable orders result in a trade Given an empty orderbook for "TW"', () => {
   let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
   let response2 = Clob.bid('trader2', 'TW', 'Sell', 9950, 100)
-  let orderBook = Clob.getOrders('TW')
 
+  let orderBook = Clob.getOrders('TW')
   assert.equal(orderBook.length, 2)
 
   assert.equal(orderBook[0].ticker, 'TW')
@@ -75,6 +75,48 @@ test3('Two tradable orders result in a trade Given an empty orderbook for "TW"',
 
   assert.equal(orderBook[0].status, 'Completed')
   assert.equal(orderBook[1].status, 'Completed')
+
+  let {order, trade} = JSON.parse(response2)
+  assert.equal(trade.ticker, 'TW')
+  assert.equal(trade.price, 9950)
+  assert.equal(trade.quantity, 100)
+  assert.equal(trade.buyOrder.trader.username, 'trader1')
+  assert.equal(trade.sellOrder.trader.username, 'trader2')
+
 })
 test3.after(() => Clob.clearAll())
 test3.run()
+
+const test4 = suite('Acceptance test4')
+test4('Two tradable orders with different quantities are partially filled Given an empty orderbook for "TW"',
+  () => {
+    let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
+    let response2 = Clob.bid('trader2', 'TW', 'Sell', 9950, 300)
+    let orderBook = Clob.getOrders('TW')
+
+    assert.equal(orderBook.length, 2)
+
+    assert.equal(orderBook[0].ticker, 'TW')
+    assert.equal(orderBook[1].ticker, 'TW')
+
+    assert.equal(orderBook[0].trader.username, 'trader1')
+    assert.equal(orderBook[1].trader.username, 'trader2')
+
+    assert.equal(orderBook[0].side, 'Buy')
+    assert.equal(orderBook[1].side, 'Sell')
+
+    assert.equal(orderBook[0].limit, 9950)
+    assert.equal(orderBook[1].limit, 9950)
+
+    assert.equal(orderBook[0].quantity, 100)
+    assert.equal(orderBook[1].quantity, 300)
+
+    assert.equal(orderBook[0].filledQuantity, 100)
+    assert.equal(orderBook[1].filledQuantity, 100)
+
+    assert.equal(orderBook[0].status, 'Completed')
+    assert.equal(orderBook[1].status, 'Open')
+  }
+)
+test4.after(() => Clob.clearAll())
+test4.run()
