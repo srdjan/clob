@@ -49,7 +49,7 @@ type Trade = {
 
 type MarketResponse = {
   order: IOrder,
-  trade: Trade
+  trades: Trade[]
 }
 
 export { Ticker, Side, Status, IOrder, IOrderId, OrderBooks, OrderBook, Trade, Traders, Trader, MarketResponse }

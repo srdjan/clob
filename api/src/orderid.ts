@@ -1,11 +1,10 @@
 import { IOrderId, Ticker, Side } from './model'
-import { performance } from 'perf_hooks'
 
 class OrderId {
+  static idSequence = 0
+  
   static next (ticker: Ticker, side: Side): string {
-    let uid = (
-      performance.now().toString(36) + Math.random().toString(36)
-    ).replace(/\./g, '')
+    let uid = OrderId.idSequence++
     return `${ticker}.${side}.${uid}`
   }
 

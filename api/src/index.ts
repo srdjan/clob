@@ -22,21 +22,19 @@ const bid = (
   limit: number,
   quantity: number
 ): string => {
-  let trader = Traders.getOrCreate(userName)
-
-  // create and save order
-  let order = new Order(trader, ticker as Ticker, side as Side, limit, quantity)
+  let trader = Traders.getOrCreate(userName)  // get or create trader
+  let order = new Order(trader, ticker as Ticker, side as Side, limit, quantity)  // create and save order
   OrderHistory.push(order)
 
-  // Save incoming order and find if there are matching orders to execute
+  //Save incoming order and find if there are matching orders to execute
   try {
     let response = OrderBook.match(order)
-    if (!response.trade) {
+    if (!response.trades || response.trades.length === 0) {
       log(`Market.bid: No Trade, orderId: ${order.id}`)
     }
     return JSON.stringify(response)
   } catch (e) {
-    log(`Market.bid: unexpected error, order: ${order}`)
+    log(`Market.bid: unexpected error, order: ${order}, error: ${e}`)
   }
   return JSON.stringify({ Result: 'Unexpected Error' })
 }
@@ -57,7 +55,6 @@ const cancel = (userName: string, id: string): string => {
 }
 
 function getOrders (ticker: string): IOrder[] {
-  //todo: flaten the response to time sorted (open only?) orders
   return Array.from(OrderBooks.getOrders(ticker as Ticker))
 }
 

@@ -1,4 +1,5 @@
 import { IOrder, OrderBooks, OrderBook, Ticker } from './model'
+import { getEmptyOrder } from './order'
 import OrderId from './orderid'
 import { log } from './utils'
 
@@ -9,21 +10,42 @@ const sortAscByLimit = (a: any, b: any) =>
 const sortDscByLimit = (a: any, b: any) =>
   (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 
+function getOrders (ticker: Ticker): IOrder[] {
+  let orderBook = OrderBooks.get(ticker)
+  if (!orderBook) {
+    log(`OrderBooks.getOrders: First time around for ticker: ${ticker}, Creating new OrderBook`)
+    OrderBooks.set(ticker, {
+      buySide: new Map<string, IOrder>(),
+      sellSide: new Map<string, IOrder>()
+    })
+    return new Array<IOrder>()
+  }
+
+  let merged = Array.from(orderBook.buySide.values()).concat(
+    Array.from(orderBook.sellSide.values())
+  )
+  let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
+  log(`\n\n!SORTED!: ${JSON.stringify(sorted)}`)
+  return sorted
+}
+
 const getOrder = (id: string): IOrder => {
   let orderId = OrderId.fromString(id) //validate
   let orderBook = OrderBooks.get(orderId.ticker)
   if (!orderBook) {
-    throw new Error(
-      `Orderbook.getOrder: Orders for ticker: ${orderId.ticker} not found`
-    )
+    OrderBooks.set(orderId.ticker, {
+      buySide: new Map<string, IOrder>(),
+      sellSide: new Map<string, IOrder>()
+    })
+    return getEmptyOrder()
   }
 
   let order =
     orderId.side === 'Buy'
-      ? orderBook.buySide.get(id)
-      : orderBook.sellSide.get(id)
+      ? orderBook?.buySide.get(id)
+      : orderBook?.sellSide.get(id)
   if (!order) {
-    throw new Error(`Orderbook.getOrder: Order with id: ${id} not found`)
+    throw new Error(`Orderbooks.getOrder: Order with id: ${id} not found`)
   }
   return order
 }
@@ -31,16 +53,21 @@ const getOrder = (id: string): IOrder => {
 function cancelOrder (id: string): boolean {
   let order = getOrder(id)
   if (!order) {
-    throw new Error(`Orderbook.cancelOrder: Order for id:${id} not found`)
+    throw new Error(`Orderbook.cancelOrderById: Order for id:${id} not found`)
   }
-  order.cancel()
 
   let orderBook = OrderBooks.get(order.ticker)
   if (!orderBook) {
     throw new Error(
-      `Orderbook.deleteOrder: OrderBook for ticker:${order.ticker} not found`
+      `Orderbook.deleteOrderById: OrderBook for ticker:${order.ticker} not found`
     )
   }
+
+  return removeOrder(orderBook, order)
+}
+
+function removeOrder (orderBook: OrderBook, order: IOrder): boolean {
+  order.cancel()
 
   if (order.side === 'Buy') {
     orderBook.buySide.delete(order.id)
@@ -54,10 +81,9 @@ function cancelOrder (id: string): boolean {
   return true
 }
 
-function updateOrder (order: IOrder): OrderBook {
+function updateOrder (orderBook: OrderBook, order: IOrder): void {
   order.update()
 
-  let orderBook = OrderBooks.get(order.ticker) as OrderBook
   if (orderBook && order.side === 'Buy') {
     orderBook.buySide.set(order.id, order)
   }
@@ -65,8 +91,6 @@ function updateOrder (order: IOrder): OrderBook {
   if (orderBook && order.side === 'Sell') {
     orderBook.sellSide.set(order.id, order)
   }
-
-  return orderBook
 }
 
 function insertOrder (order: IOrder): OrderBook {
@@ -78,36 +102,24 @@ function insertOrder (order: IOrder): OrderBook {
     })
   }
 
-  let bookOrder = OrderBooks.get(order.ticker) as OrderBook
-  if (bookOrder && order.side === 'Buy') {
-    bookOrder.buySide.set(order.id, order)
-    let sorted = new Map([...bookOrder.buySide].sort(sortAscByLimit))
-    bookOrder.buySide = sorted
+  let orderBook = OrderBooks.get(order.ticker) as OrderBook
+  if (orderBook && order.side === 'Buy') {
+    orderBook.buySide.set(order.id, order)
+    let sorted = new Map([...orderBook.buySide].sort(sortAscByLimit))
+    orderBook.buySide = sorted
   }
 
-  if (bookOrder && order.side === 'Sell') {
-    bookOrder.sellSide.set(order.id, order)
-    let sorted = new Map([...bookOrder.sellSide].sort(sortDscByLimit))
-    bookOrder.sellSide = sorted
+  if (orderBook && order.side === 'Sell') {
+    orderBook.sellSide.set(order.id, order)
+    let sorted = new Map([...orderBook.sellSide].sort(sortDscByLimit))
+    orderBook.sellSide = sorted
   }
 
-  return bookOrder
-}
-
-function getOrders (ticker: Ticker): IOrder[] {
-  let orderBook = OrderBooks.get(ticker)
-  if (!orderBook) {
-    throw new Error(
-      `Orderbook.getOrderBook: Orders for ticker: ${ticker} not found`
-    )
-  }
-  let merged = Array.from(orderBook.buySide.values()).concat(Array.from(orderBook.sellSide.values()))
-  let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
-  return sorted
+  return orderBook
 }
 
 function clearAll(): void {
   OrderBooks.clear()
 }
 
-export { getOrders, getOrder, insertOrder, updateOrder, cancelOrder, clearAll }
+export { getOrders, getOrder, insertOrder, updateOrder, removeOrder, cancelOrder, clearAll }

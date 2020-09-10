@@ -8,7 +8,7 @@ function getOrCreate (userName: string): Trader {
     return traders.get(userName) as Trader
   }
 
-  log(`Traders: trader's first bid, auto registering ${userName}`)
+  log(`Traders.getOrCreate: auto registering ${userName}`)
   let trader: Trader = { username: userName, password: 'todo' }
   traders.set(trader.username, trader)
   return trader
@@ -17,7 +17,7 @@ function getOrCreate (userName: string): Trader {
 function verify (userName: string): boolean {
   if (!traders.has(userName)) {
     throw new Error(
-      `Traders: invalid user: ${userName}, order not allowed`
+      `Traders.verify: invalid user: ${userName}, order not allowed`
     )
   }
   return true
