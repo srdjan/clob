@@ -86,7 +86,7 @@ test6('Complete a partial Buy trade', () => {
   assert.equal(buyResponse.order.limit, 2000)
   assert.equal(buyResponse.order.quantity, 100)
   assert.equal(buyResponse.order.filledQuantity, 90)
-  assert.equal(buyResponse.order.status, 'Partial')
+  assert.equal(buyResponse.order.status, 'Open')
 })
 test6.after(() => OrderBooks.clearAll())
 test6.run()
@@ -102,7 +102,7 @@ test7('Complete a partial Sell trade', () => {
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
   assert.equal(sellResponse.order.filledQuantity, 90)
-  assert.equal(sellResponse.order.status, 'Partial')
+  assert.equal(sellResponse.order.status, 'Open')
 })
 test7.after(() => OrderBooks.clearAll())
 test7.run()
@@ -114,7 +114,9 @@ test8('Fail a self trade', () => {
   assert.equal(buyResponse.order.quantity, 100)
 
   let sellResponse = OrderBook.match(newOrder('joe', 'TW', 'Sell', 10, 100))
-  assert.equal(sellResponse.trade.message, 'Fail')
+  console.log(`sellResponse: ${JSON.stringify(sellResponse)}`)
+  assert.equal(sellResponse.trades, [])
 })
 test8.after(() => OrderBooks.clearAll())
 test8.run()
+

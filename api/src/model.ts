@@ -2,7 +2,7 @@ import { Money, Quantity, Timestamp } from './utils'
 
 type Ticker = 'TW' | 'NET' | 'T' | 'None'
 type Side = 'Buy' | 'Sell' | 'None'
-type Status = 'Open' | 'Partial' | 'Completed' | 'Canceled' | 'None'
+type Status = 'Open' | 'Completed' | 'Canceled' | 'None'
 
 type Trader = {
   username: string
