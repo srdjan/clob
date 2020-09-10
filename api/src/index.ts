@@ -1,6 +1,6 @@
 import { Order } from './order'
 import { Ticker, Side, IOrder } from './model'
-import * as OrderBooks from './orderbooks'
+import * as OrderBooks from './engine'
 import * as OrderBook from './orderbook'
 import * as Traders from './traders'
 import { log } from './utils'

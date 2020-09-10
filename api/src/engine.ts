@@ -10,7 +10,7 @@ const sortAscByLimit = (a: any, b: any) =>
 const sortDscByLimit = (a: any, b: any) =>
   (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 
-function getOrders (ticker: Ticker): IOrder[] {
+function getLiveOrders (ticker: Ticker): IOrder[] {
   let orderBook = OrderBooks.get(ticker)
   if (!orderBook) {
     log(`OrderBooks.getOrders: First time around for ticker: ${ticker}, Creating new OrderBook`)
@@ -24,8 +24,14 @@ function getOrders (ticker: Ticker): IOrder[] {
   let merged = Array.from(orderBook.buySide.values()).concat(
     Array.from(orderBook.sellSide.values())
   )
+
+  //todo: show only 'Open' orders? add filter param:
+  //  function getLiveOrders (ticker: Ticker): IOrder[], filter: Status[]) { ...}
+  // let filtered = merged.filter(order => order.status !== 'None' && order.status !== 'Canceled')
+  // log(`\n\n!FILTERED!: ${JSON.stringify(filtered)}`)
+  
   let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
-  log(`\n\n!SORTED!: ${JSON.stringify(sorted)}`)
+  // log(`\n\n!SORTED!: ${JSON.stringify(sorted)}`)
   return sorted
 }
 
@@ -122,4 +128,4 @@ function clearAll(): void {
   OrderBooks.clear()
 }
 
-export { getOrders, getOrder, insertOrder, updateOrder, removeOrder, cancelOrder, clearAll }
+export { getLiveOrders as getOrders, getOrder, insertOrder, updateOrder, removeOrder, cancelOrder, clearAll }

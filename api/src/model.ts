@@ -31,9 +31,10 @@ interface IOrder {
   complete (): void
 } 
 
+type OrderBookSide = Map<string, IOrder>
 type OrderBook = {
-  buySide: Map<string, IOrder>,
-  sellSide: Map<string, IOrder>
+  buySide: OrderBookSide,
+  sellSide: OrderBookSide
 }
 type OrderBooks = Map<Ticker, OrderBook>
 
@@ -52,4 +53,4 @@ type MarketResponse = {
   trades: Trade[]
 }
 
-export { Ticker, Side, Status, IOrder, IOrderId, OrderBooks, OrderBook, Trade, Traders, Trader, MarketResponse }
+export { Ticker, Side, Status, IOrder, IOrderId, OrderBooks, OrderBook, OrderBookSide, Trade, Traders, Trader, MarketResponse }

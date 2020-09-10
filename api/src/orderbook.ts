@@ -1,28 +1,26 @@
-import { IOrder, OrderBook, MarketResponse, Ticker, Trade } from './model'
+import { IOrder, Side, OrderBookSide, MarketResponse, Ticker, Trade } from './model'
 import { getEmptyOrder } from './order'
-import * as OrderBooks from './orderbooks'
+import * as Engine from './engine'
 import { log, TradeId } from './utils'
 
 function match (order: IOrder): MarketResponse {
   let trades = new Array<Trade>()
-  let orderBook = OrderBooks.insertOrder(order)
+  let orderBook = Engine.insertOrder(order)
+
+  let orderBookSide = order.side == 'Buy' ? orderBook.sellSide : orderBook.buySide
   let i: number
-  for(i=0; i<10; i++) {
-    let matchOrder = getMatching(order, orderBook)
+  for (i = 0; i < 100; i++) {
+    let matchOrder = getMatching(order, orderBookSide)
     if (!matchOrder) {
-      log(`Orderbook.match: NO matching orders`)
       break
     }
 
-    if (matchOrder.trader.username === order.trader.username) {
-      log(`Orderbook.match: no trade possible: SAME trader on both sides`)
-      //todo: but check if there are trades to be made with ther traders???
-      break
-    }
-
-    let trade = getEmptyTrade(order.ticker)
+    let trade = initializeTrade(order.ticker)
     trade.price = matchOrder.limit
-    trade.quantity = order.quantity > matchOrder.quantity ? matchOrder.quantity : order.quantity
+    trade.quantity =
+      order.quantity > matchOrder.quantity
+        ? matchOrder.quantity
+        : order.quantity
     trade.buyOrder = order.side === 'Buy' ? order : matchOrder
     trade.sellOrder = order.side === 'Sell' ? order : matchOrder
     trade.message = 'Success'
@@ -34,71 +32,55 @@ function match (order: IOrder): MarketResponse {
       order.filledQuantity = matchOrder.quantity
       matchOrder.status = 'Completed'
       matchOrder.filledQuantity = matchOrder.quantity
-    } 
-    else if (availableQuantity < matchOrder.quantity) {
+    } else if (availableQuantity < matchOrder.quantity) {
       order.status = 'Completed'
       order.filledQuantity = order.quantity
       matchOrder.status = 'Open'
       matchOrder.filledQuantity = order.quantity
-    }
-    else if (order.quantity === matchOrder.quantity) {
+    } else if (order.quantity === matchOrder.quantity) {
       order.status = 'Completed'
       order.filledQuantity = order.quantity
       matchOrder.status = 'Completed'
       matchOrder.filledQuantity = order.quantity
     }
 
-    OrderBooks.updateOrder(orderBook, order)
+    Engine.updateOrder(orderBook, order)
     log(`\n\nOrderbook.match: updated order ${JSON.stringify(order)}`)
-    OrderBooks.updateOrder(orderBook, matchOrder)
+    Engine.updateOrder(orderBook, matchOrder)
     log(`\n\nOrderbook.match: updated matchOrder ${JSON.stringify(matchOrder)}`)
-
-    //todo: need to filter orders with status: 'canceled' 
-    // or remove them (?) (as long as they are in order history):
-    // if(matchOrder.quantity >= matchOrder.filledQuantity) {
-    //   OrderBooks.removeOrder(orderBook, matchOrder)
-    // }
   }
 
   return { order, trades }
 }
 
-function getMatching (order: IOrder, orderBook: OrderBook): IOrder | undefined {
-  if (order.side === 'Buy') {
-    if (orderBook.sellSide.size === 0) {
-      log(`Orderbook.getMatching: no SELL side orders`)
-      return undefined
-    }
-    let matchOrder = orderBook.sellSide.entries().next().value[1]
-    if (matchOrder.status === 'Open' && matchOrder.limit <= order.limit) {
-      log(`Orderbook.getMatching: FOUND MATCH order on the SELL side`)
-      return matchOrder // there are sellers at given or better price
-    }
-  }
-  else if (order.side === 'Sell') {
-    if (orderBook.buySide.size === 0) {
-      log(`Orderbook.getMatching: no BUY sidee orders`)
-      return undefined
-    }
-    let matchOrder = orderBook.buySide.entries().next().value[1]
-    if (matchOrder.status === 'Open' && matchOrder.limit >= order.limit) {
-      log(`Orderbook.getMatching: FOUND MATCH order on the BUY side`)
-      return matchOrder // there are buyers at given or better price
-    }
+function getMatching (order: IOrder, orderBookSide: OrderBookSide): IOrder | undefined {
+  if (orderBookSide.size === 0) {
+    log(`Orderbook.getMatching: NO matched [${order.side}] side orders`)
+    return undefined
   }
 
-  log(`Orderbook.getMatching : no MATCH order on the ${order.side} side found`)
+  let openOrders = Array.from(orderBookSide.values()).filter(o => o.status === 'Open')
+  openOrders.forEach(openOrder => {
+    if (
+      openOrder.status === 'Open' &&
+      openOrder.limit <= order.limit &&
+      openOrder.trader.username !== order.trader.username
+    ) {
+      log(`Orderbook.getMatching: FOUND match ${openOrder.id} on the [${openOrder.side}] side`)
+      return openOrder
+    }
+  })
   return undefined
 }
 
-function getEmptyTrade(ticker: Ticker): Trade {
+function initializeTrade (ticker: Ticker): Trade {
   return {
     ticker: ticker,
     price: 0,
     quantity: 0,
     buyOrder: getEmptyOrder(),
     sellOrder: getEmptyOrder(),
-    createdAt: TradeId.next(),//new Date().getTime(),
+    createdAt: TradeId.next(), //new Date().getTime(),
     message: 'Fail'
   }
 }
