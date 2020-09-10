@@ -1,131 +1,89 @@
-import { IOrder, OrderBooks, OrderBook, Ticker } from './model'
+import { IOrder, MarketResponse, Ticker, Trade } from './model'
 import { getEmptyOrder } from './order'
-import OrderId from './orderid'
-import { log } from './utils'
+import * as Engine from './orderbooks'
+import { log, TradeId } from './utils'
 
-const OrderBooks: OrderBooks = new Map<Ticker, OrderBook>()
+function match (order: IOrder): MarketResponse {
+  let trades = new Array<Trade>()
+  let orderBook = Engine.insertOrder(order)
 
-const sortAscByLimit = (a: any, b: any) =>
-  (a[1].limit > b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
-const sortDscByLimit = (a: any, b: any) =>
-  (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
-
-function getLiveOrders (ticker: Ticker): IOrder[] {
-  let orderBook = OrderBooks.get(ticker)
-  if (!orderBook) {
-    log(`OrderBooks.getOrders: First time around for ticker: ${ticker}, Creating new OrderBook`)
-    OrderBooks.set(ticker, {
-      buySide: new Map<string, IOrder>(),
-      sellSide: new Map<string, IOrder>()
-    })
-    return new Array<IOrder>()
+  let orderBookSide = order.side === 'Buy' ? orderBook.sellSide : orderBook.buySide
+  if (orderBookSide.size === 0) {
+    log(`Orderbook.match: NO matched [${order.side}] side orders`)
+    return {order, trades}
   }
-
-  let merged = Array.from(orderBook.buySide.values()).concat(
-    Array.from(orderBook.sellSide.values())
-  )
-
-  //todo: show only 'Open' orders? add filter param:
-  //  function getLiveOrders (ticker: Ticker): IOrder[], filter: Status[]) { ...}
-  // let filtered = merged.filter(order => order.status !== 'None' && order.status !== 'Canceled')
-  // log(`\n\n!FILTERED!: ${JSON.stringify(filtered)}`)
   
-  let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
-  // log(`\n\n!SORTED!: ${JSON.stringify(sorted)}`)
-  return sorted
+  let openOrders = Array.from(orderBookSide.values()).filter(o => o.status === 'Open')
+  for(let matchOrder of openOrders)  {
+    if (matchOrder.status !== 'Open') {
+      continue
+    } 
+    
+    if(matchOrder.trader.username === order.trader.username) {
+      log(`Orderbook.getMatching: NOT allowed, same trader on both sides ${matchOrder.trader.username}`)
+      continue
+    }
+
+    if(order.side === 'Buy' && order.limit < matchOrder.limit) {
+      log( `Orderbook.getMatching: NOT FOUND match ${matchOrder.id} on the [${matchOrder.side}] side`)
+      continue
+    }
+
+    if (order.side === 'Sell' && order.limit > matchOrder.limit) {
+      log(`Orderbook.getMatching: NOT FOUND match ${matchOrder.id} on the [${matchOrder.side}] side` )
+      continue
+    }
+
+    let trade = _initializeTrade(order.ticker)
+    trade.price = matchOrder.limit
+    trade.quantity = order.quantity > matchOrder.quantity ? matchOrder.quantity : order.quantity
+    trade.buyOrder = order.side === 'Buy' ? order : matchOrder
+    trade.sellOrder = order.side === 'Sell' ? order : matchOrder
+    trade.message = 'Success'
+    trades.push(trade)
+
+    let available = order.quantity - order.filledQuantity
+    if (available > matchOrder.quantity) {
+      order.status = 'Open'
+      order.filledQuantity += available - matchOrder.quantity
+
+      matchOrder.status = 'Completed'
+      matchOrder.filledQuantity = matchOrder.quantity
+    } 
+    else if (available < matchOrder.quantity) {
+      order.status = 'Completed'
+      order.filledQuantity = order.quantity
+    
+      matchOrder.status = 'Open'
+      matchOrder.filledQuantity += available
+    } 
+    else if (order.quantity === matchOrder.quantity) {
+      order.status = 'Completed'
+      order.filledQuantity = order.quantity
+    
+      matchOrder.status = 'Completed'
+      matchOrder.filledQuantity = matchOrder.quantity
+    }
+
+    Engine.updateOrder(orderBook, order)
+    log(`\n\nOrderbook.match: updated order ${JSON.stringify(order)}`)
+    Engine.updateOrder(orderBook, matchOrder)
+    log(`\n\nOrderbook.match: updated matchOrder ${JSON.stringify(matchOrder)}`)
+  }
+  
+  return { order, trades }
 }
 
-const getOrder = (id: string): IOrder => {
-  let orderId = OrderId.fromString(id) //validate
-  let orderBook = OrderBooks.get(orderId.ticker)
-  if (!orderBook) {
-    OrderBooks.set(orderId.ticker, {
-      buySide: new Map<string, IOrder>(),
-      sellSide: new Map<string, IOrder>()
-    })
-    return getEmptyOrder()
-  }
-
-  let order =
-    orderId.side === 'Buy'
-      ? orderBook?.buySide.get(id)
-      : orderBook?.sellSide.get(id)
-  if (!order) {
-    throw new Error(`Orderbooks.getOrder: Order with id: ${id} not found`)
-  }
-  return order
-}
-
-function cancelOrder (id: string): boolean {
-  let order = getOrder(id)
-  if (!order) {
-    throw new Error(`Orderbook.cancelOrderById: Order for id:${id} not found`)
-  }
-
-  let orderBook = OrderBooks.get(order.ticker)
-  if (!orderBook) {
-    throw new Error(
-      `Orderbook.deleteOrderById: OrderBook for ticker:${order.ticker} not found`
-    )
-  }
-
-  return removeOrder(orderBook, order)
-}
-
-function removeOrder (orderBook: OrderBook, order: IOrder): boolean {
-  order.cancel()
-
-  if (order.side === 'Buy') {
-    orderBook.buySide.delete(order.id)
-    let sorted = new Map([...orderBook.buySide].sort(sortAscByLimit))
-    orderBook.buySide = sorted
-  } else {
-    orderBook.sellSide.delete(order.id)
-    let sorted = new Map([...orderBook.sellSide].sort(sortDscByLimit))
-    orderBook.sellSide = sorted
-  }
-  return true
-}
-
-function updateOrder (orderBook: OrderBook, order: IOrder): void {
-  order.update()
-
-  if (orderBook && order.side === 'Buy') {
-    orderBook.buySide.set(order.id, order)
-  }
-
-  if (orderBook && order.side === 'Sell') {
-    orderBook.sellSide.set(order.id, order)
+function _initializeTrade (ticker: Ticker): Trade {
+  return {
+    ticker: ticker,
+    price: 0,
+    quantity: 0,
+    buyOrder: getEmptyOrder(),
+    sellOrder: getEmptyOrder(),
+    createdAt: TradeId.next(), //new Date().getTime(),
+    message: 'Fail'
   }
 }
 
-function insertOrder (order: IOrder): OrderBook {
-  if (!OrderBooks.has(order.ticker)) {
-    log(`Orderbooks.insertOrder: initiate new OrderBook for ticker: ${order.ticker}`)
-    OrderBooks.set(order.ticker, {
-      buySide: new Map<string, IOrder>(),
-      sellSide: new Map<string, IOrder>()
-    })
-  }
-
-  let orderBook = OrderBooks.get(order.ticker) as OrderBook
-  if (orderBook && order.side === 'Buy') {
-    orderBook.buySide.set(order.id, order)
-    let sorted = new Map([...orderBook.buySide].sort(sortAscByLimit))
-    orderBook.buySide = sorted
-  }
-
-  if (orderBook && order.side === 'Sell') {
-    orderBook.sellSide.set(order.id, order)
-    let sorted = new Map([...orderBook.sellSide].sort(sortDscByLimit))
-    orderBook.sellSide = sorted
-  }
-
-  return orderBook
-}
-
-function clearAll(): void {
-  OrderBooks.clear()
-}
-
-export { getLiveOrders as getOrders, getOrder, insertOrder, updateOrder, removeOrder, cancelOrder, clearAll }
+export { match }

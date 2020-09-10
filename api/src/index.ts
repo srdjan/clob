@@ -1,7 +1,7 @@
 import { Order } from './order'
 import { Ticker, Side, IOrder } from './model'
-import * as OrderBooks from './engine'
-import * as OrderBook from './orderbook'
+import * as OrderBooks from './orderbooks'
+import * as OrderBook from './engine'
 import * as Traders from './traders'
 import { log } from './utils'
 import OrderHistory from './orderHistory'
@@ -54,12 +54,12 @@ const cancel = (userName: string, id: string): string => {
   return JSON.stringify({ Result: 'Unexpected Error' })
 }
 
-function getOrders (ticker: string): IOrder[] {
-  return Array.from(OrderBooks.getOrders(ticker as Ticker))
+function getLiveOrders (ticker: string): IOrder[] {
+  return Array.from(OrderBooks.getLiveOrders(ticker as Ticker))
 }
 
 function clearAll(): void {
   OrderBooks.clearAll()
 }
 
-export { findOrder, bid, cancel, getOrders, clearAll }
+export { findOrder, bid, cancel, getLiveOrders, clearAll }
