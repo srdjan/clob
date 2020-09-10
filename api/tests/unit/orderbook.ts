@@ -1,6 +1,7 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
-import * as Ob from '../../src/orderbook'
+import * as OrderBooks from '../../src/orderbooks'
+import * as OrderBook from '../../src/orderbook'
 import { IOrder, Side, Ticker } from '../../src/model'
 import {Order} from '../../src/order'
 
@@ -17,7 +18,7 @@ function newOrder (
 }
 
 test('make first Buy Order', () => {
-  let response = Ob.match(newOrder('joe', 'TW', 'Buy', 10, 100))
+  let response = OrderBook.match(newOrder('joe', 'TW', 'Buy', 10, 100))
 
   assert.equal(response.order.ticker, 'TW')
   assert.equal(response.order.side, 'Buy')
@@ -26,7 +27,7 @@ test('make first Buy Order', () => {
 })
 
 test('make first Sell Order', () => {
-  let response = Ob.match(newOrder('joe', 'TW', 'Sell', 10, 100))
+  let response = OrderBook.match(newOrder('joe', 'TW', 'Sell', 10, 100))
 
   assert.equal(response.order.ticker, 'TW')
   assert.equal(response.order.side, 'Sell')
@@ -35,39 +36,39 @@ test('make first Sell Order', () => {
 })
 
 test('cancel order', () => {
-  let buyResponse = Ob.match(newOrder('joe', 'TW', 'Buy', 10, 100))
-  let buyOrder = Ob.getOrder(buyResponse.order.id)
-  let canceledOrder = Ob.cancelOrder(buyOrder.id)
+  let buyResponse = OrderBook.match(newOrder('joe', 'TW', 'Buy', 10, 100))
+  let buyOrder = OrderBooks.getOrder(buyResponse.order.id)
+  let canceledOrder = OrderBooks.cancelOrder(buyOrder.id)
   assert.equal(canceledOrder, true)
 })
 
 test('Complete a full Buy trade', () => {
-  let sellResponse = Ob.match(newOrder('joe', 'TW', 'Sell', 10, 100))
+  let sellResponse = OrderBook.match(newOrder('joe', 'TW', 'Sell', 10, 100))
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 
-  let buyResponse = Ob.match(newOrder('sue', 'TW', 'Buy', 10, 100))
+  let buyResponse = OrderBook.match(newOrder('sue', 'TW', 'Buy', 10, 100))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 })
 
 test('Complete a full Sell trade', () => {
-  let buyResponse = Ob.match(newOrder('joe', 'TW', 'Buy', 10, 100))
+  let buyResponse = OrderBook.match(newOrder('joe', 'TW', 'Buy', 10, 100))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
-  let sellResponse = Ob.match(newOrder('sue', 'TW', 'Sell', 10, 100))
+  let sellResponse = OrderBook.match(newOrder('sue', 'TW', 'Sell', 10, 100))
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 })
 
 test('Complete a partial Buy trade', () => {
-  let sellResponse = Ob.match(newOrder('joe', 'NET', 'Sell', 2000, 90))
+  let sellResponse = OrderBook.match(newOrder('joe', 'NET', 'Sell', 2000, 90))
   assert.equal(sellResponse.order.limit, 2000)
   assert.equal(sellResponse.order.quantity, 90)
   assert.equal(sellResponse.order.status, 'Open')
 
-  let buyResponse = Ob.match(newOrder('sue', 'NET', 'Buy', 2000, 100))
+  let buyResponse = OrderBook.match(newOrder('sue', 'NET', 'Buy', 2000, 100))
   assert.equal(buyResponse.order.limit, 2000)
   assert.equal(buyResponse.order.quantity, 100)
   assert.equal(buyResponse.order.filledQuantity, 90)
@@ -75,12 +76,12 @@ test('Complete a partial Buy trade', () => {
 })
 
 test('Complete a partial Sell trade', () => {
-  let buyResponse = Ob.match(newOrder('joe', 'T', 'Buy', 10, 90))
+  let buyResponse = OrderBook.match(newOrder('joe', 'T', 'Buy', 10, 90))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 90)
   assert.equal(buyResponse.order.status, 'Open')
 
-  let sellResponse = Ob.match(newOrder('sue', 'T', 'Sell', 10, 100))
+  let sellResponse = OrderBook.match(newOrder('sue', 'T', 'Sell', 10, 100))
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
   assert.equal(sellResponse.order.filledQuantity, 90)
@@ -88,11 +89,11 @@ test('Complete a partial Sell trade', () => {
 })
 
 test('Fail a self trade', () => {
-  let buyResponse = Ob.match(newOrder('joe', 'TW', 'Buy', 10, 100))
+  let buyResponse = OrderBook.match(newOrder('joe', 'TW', 'Buy', 10, 100))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
-  let sellResponse = Ob.match(newOrder('joe', 'TW', 'Sell', 10, 100))
+  let sellResponse = OrderBook.match(newOrder('joe', 'TW', 'Sell', 10, 100))
   assert.equal(sellResponse.trade.message, 'Fail')
 })
 

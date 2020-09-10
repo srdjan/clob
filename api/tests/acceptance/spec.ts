@@ -2,6 +2,7 @@ import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 import * as Clob from '../../src/index'
 import {MarketResponse} from '../../src/model'
+
 const test = suite('Acceptance test')
 
 test('A single valid order is accepted into the limit order book Given an empty orderbook for "TW"', () => {
@@ -15,7 +16,7 @@ test('A single valid order is accepted into the limit order book Given an empty 
 test.only('Multiple valid orders are accepted into the limit order book Given an empty orderbook for "TW"', () => {
   let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
   let response2 = Clob.bid('trader2', 'TW', 'Sell', 9960, 200)
-  let orderBook = Clob.getEntries('TW')
+  let orderBook = Clob.getOrders('TW')
 
   assert.equal(orderBook.length, 2)
 })
