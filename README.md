@@ -1,7 +1,7 @@
 # CLOB - Central Limit Orderbook trading application
 
-A full stack application, using React for the frontend and NodeJS for services, that implements POC of a Central Limit Orderbook (CLOB) stock trading marketplace.
-It accepts orders via an REST API and publishes updates on orderbook state changes or if trades occur. 
+A full stack application, using React for the frontend and NodeJS for services, that implements POC of a Central Limit OrderBook (CLOB) stock trading marketplace.
+It accepts orders via an REST API via UI or CLi clients and publishes updates on orderbook state changes. 
 
 ### Installation
 
@@ -24,10 +24,16 @@ npm run build
 3) On a succesful build, try running tests:
 
 ```sh
-npm run test
+npm run test:unit
+```
+for unit tests, or:
+```
+npm run test:accept
 ```
 
-## CLI
+for acceptance tests.
+
+## CLI [todo]
 ```
 $ cli --help
 cli
@@ -47,7 +53,7 @@ Options:
   
 ```
 
-## UI
+## UI [todo]
 For UI development change directory to ./ui, install dependencies and build the project:
 ```
 [todo]
