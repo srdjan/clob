@@ -4,7 +4,6 @@ import * as OrderBooks from './orderbooks'
 import * as OrderBook from './engine'
 import * as Traders from './traders'
 import { log } from './utils'
-import OrderHistory from './orderHistory'
 
 const findOrder = (id: string): string => {
   try {
@@ -22,11 +21,9 @@ const bid = (
   limit: number,
   quantity: number
 ): string => {
-  let trader = Traders.getOrCreate(userName)  // get or create trader
-  let order = new Order(trader, ticker as Ticker, side as Side, limit, quantity)  // create and save order
-  OrderHistory.push(order)
+  let trader = Traders.getOrCreate(userName)
+  let order = new Order(trader, ticker as Ticker, side as Side, limit, quantity)
 
-  //Save incoming order and find if there are matching orders to execute
   try {
     let response = OrderBook.match(order)
     if (!response.trades || response.trades.length === 0) {

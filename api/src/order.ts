@@ -30,6 +30,8 @@ class Order implements IOrder {
     this.filledQuantity = 0
     this.status = 'Open'
     this.createdAt = SeqGen.next()
+
+    OrderHistory.push(this)
   }
 
   cancel (): void {
