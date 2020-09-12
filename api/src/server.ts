@@ -2,13 +2,22 @@ const uWS = require('uWebSockets.js')
 const { StringDecoder } = require('string_decoder')
 const decoder = new StringDecoder('utf8')
 import * as Market from './index'
+import { Side, Ticker } from './model'
+
+type Bid = {
+  msg: string,
+  ticker: Ticker,
+  side: Side,
+  limit: number,
+  quantity: number
+}
 
 uWS.App().ws('/*', {
     message: (ws: any, message: string, isBinary: boolean) => {
-      let bid = JSON.parse(decoder.write(Buffer.from(message)))
-      switch (bid.side) {
+      let bid:Bid = JSON.parse(decoder.write(Buffer.from(message)))
+      switch (bid.msg) {
         case 'sub': {  // Subscribe to the ticker's value stream 
-          ws.subscribe(`clob/${bid.ticker}`)
+          ws.subscribe(`clob/#`)
           break
         }
         case 'buy': {
