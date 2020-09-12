@@ -5,11 +5,11 @@ import * as OrderBook from './engine'
 import * as Traders from './traders'
 import { log } from './utils'
 
-const findOrder = (id: string): string => {
+const find = (id: string): string => {
   try {
     return JSON.stringify(OrderBooks.getOrder(id))
   } catch (e) {
-    log(`Market.findOrder: unexpected error, orderId: ${id}`)
+    log(`Market.find: unexpected error, orderId: ${id}`)
   }
   return JSON.stringify({ Result: 'Unexpected Error' })
 }
@@ -51,12 +51,12 @@ const cancel = (userName: string, id: string): string => {
   return JSON.stringify({ Result: 'Unexpected Error' })
 }
 
-function getOrders (ticker: string): IOrder[] {
+function getAll (ticker: string): IOrder[] {
   return Array.from(OrderBooks.getOrders(ticker as Ticker))
 }
 
-function clearAll(): void {
+function clearAll (): void {
   OrderBooks.clearAll()
 }
 
-export { findOrder, bid, cancel, getOrders, clearAll }
+export { find, bid, cancel, getAll, clearAll }
