@@ -54,12 +54,12 @@ const cancel = (userName: string, id: string): string => {
   return JSON.stringify({ Result: 'Unexpected Error' })
 }
 
-function getLiveOrders (ticker: string): IOrder[] {
-  return Array.from(OrderBooks.getLiveOrders(ticker as Ticker))
+function getOrders (ticker: string): IOrder[] {
+  return Array.from(OrderBooks.getOrders(ticker as Ticker))
 }
 
 function clearAll(): void {
   OrderBooks.clearAll()
 }
 
-export { findOrder, bid, cancel, getLiveOrders, clearAll }
+export { findOrder, bid, cancel, getOrders, clearAll }

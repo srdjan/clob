@@ -136,7 +136,7 @@ test9('Complete a multiple matching trades on one Sell trade', () => {
   OrderBook.match(newOrder('trader3', 'TW', 'Buy', 9935, 500))
   OrderBook.match(newOrder('trader4', 'TW', 'Sell', 9930, 1000))
 
-  let ob = OrderBooks.getLiveOrders('TW')
+  let ob = OrderBooks.getOrders('TW')
   assert.equal(ob.length, 4)
 
   showOrders(ob)
