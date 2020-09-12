@@ -33,7 +33,7 @@ const bid = (
   } catch (e) {
     log(`Market.bid: (1) unexpected error, order: ${order}, error: ${e}`)
   }
-  return JSON.stringify({ Result: 'Unexpected Error' })
+  return JSON.stringify({ result: 'Unexpected Error' })
 }
 
 const cancel = (userName: string, id: string): string => {

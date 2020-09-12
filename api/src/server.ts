@@ -1,24 +1,32 @@
 const uWS = require('uWebSockets.js')
-
 import * as Market from './index'
-import { Side, Ticker } from './model'
 import { log } from './utils'
 
-type Order = {
-  msg: string
-  ticker: Ticker
-  side: Side
-  limit: number
-  quantity: number
-}
+//spec: in-message format def:
+//----------------------------
+// type OrderReq = {
+//   msg: string
+//   ticker: Ticker
+//   side: Side
+//   limit: number
+//   quantity: number
+// }
+//
+// out-message format def:
+//----------------------------
+// type OrderResp = {
+//   result: string
+//   orderbook: {
+//     bids: Array<{limit: number, quantity: number}>
+//     asks: Array<{limit: number, quantity: number}>
+//   }
+// }
 
 uWS
   .App()
   .ws('/*', {
     message: (ws: any, message: ArrayBuffer, isBinary: boolean) => {
       const order = JSON.parse(Buffer.from(message).toString('utf8'))
-      log(`message received: ${order.msg}`)
-
       switch (order.msg) {
         case 'sub': {
           log(`Subscribe msg received: ${order.msg}`)

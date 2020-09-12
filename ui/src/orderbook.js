@@ -1,5 +1,25 @@
 import React, { useState, useEffect } from 'react'
 
+//spec: in-message format def:
+//----------------------------
+// type OrderReq = {
+//   msg: string
+//   ticker: Ticker
+//   side: Side
+//   limit: number
+//   quantity: number
+// }
+//
+// out-message format def:
+//----------------------------
+// type OrderResp = {
+//   result: string 
+//   orderbook: {
+//     bids: Array<{limit: number, quantity: number}>
+//     asks: Array<{limit: number, quantity: number}>
+//   }
+// }
+
 const OrderBook = () => {
   const [orders, setOrders] = useState([])
   const ticker = 'TW'
