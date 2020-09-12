@@ -128,4 +128,4 @@ function clearAll(): void {
   OrderBooks.clear()
 }
 
-export { getOrders, getOrder, insertOrder, updateOrder, removeOrder, cancelOrder, clearAll }
+export { getOrders, getOrder, insertOrder, updateOrder, cancelOrder, clearAll }
