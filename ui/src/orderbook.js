@@ -7,7 +7,7 @@ const OrderBook = () => {
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:9001')
     ws.onopen = () => {
-      ws.send(JSON.stringify({msg: 'sub', ticker: 'TW'}))
+      ws.send(JSON.stringify({msg: 'sub'}))
     }
     ws.onmessage = event => {
       const response = JSON.parse(event.data)
