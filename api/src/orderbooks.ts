@@ -69,10 +69,10 @@ function cancelOrder (id: string): boolean {
     )
   }
 
-  return removeOrder(orderBook, order)
+  return _removeOrder(orderBook, order)
 }
 
-function removeOrder (orderBook: OrderBook, order: IOrder): boolean {
+function _removeOrder (orderBook: OrderBook, order: IOrder): boolean {
   order.cancel()
 
   if (order.side === 'Buy') {
