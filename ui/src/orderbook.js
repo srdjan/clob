@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { TradeForm } from './tradeform'
 
 /*  spec: in-message format def:
   ----------------------------
@@ -61,7 +62,7 @@ const OrderBook = () => {
 
   return ( 
     <div className='container'>
-      <table>
+      <table className='item'>
         {head('Buy ..................................................... Sell')}
         <tbody>{rows(orders)}</tbody>
       </table>
