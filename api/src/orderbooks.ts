@@ -13,7 +13,7 @@ const _sortDscByLimit = (a: any, b: any) =>
 function getAll (ticker: Ticker): IOrder[] {
   let orderBook = OrderBooks.get(ticker)
   if (!orderBook) {
-    log(`OrderBooks.getAll: First time around for ticker: ${ticker}, Creating new OrderBook`)
+    log(`OrderBooks.getAll: initiate new OrderBook for: ${ticker}`)
     OrderBooks.set(ticker, {
       buySide: new Map<string, IOrder>(),
       sellSide: new Map<string, IOrder>()
@@ -24,14 +24,7 @@ function getAll (ticker: Ticker): IOrder[] {
   let merged = Array.from(orderBook.buySide.values()).concat(
     Array.from(orderBook.sellSide.values())
   )
-
-  //todo: show only 'Open' orders? add filter param:
-  //  function getLiveOrders (ticker: Ticker): IOrder[], filter: Status[]) { ...}
-  // let filtered = merged.filter(order => order.status !== 'None' && order.status !== 'Canceled')
-  // log(`\n\n!FILTERED!: ${JSON.stringify(filtered)}`)
-  
   let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
-  // log(`\n\n!SORTED!: ${JSON.stringify(sorted)}`)
   return sorted
 }
 

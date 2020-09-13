@@ -22,7 +22,7 @@ test2('Multiple valid orders are accepted into the limit order book Given an emp
   let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
   let response2 = Clob.bid('trader2', 'TW', 'Sell', 9960, 200)
   let orderBook = Clob.getAll('TW')
-  console.log(`\n\ORDERBOOK: ${JSON.stringify(orderBook)}`)
+  // console.log(`\n\ORDERBOOK: ${JSON.stringify(orderBook)}`)
   assert.equal(orderBook.length, 2)
 
   assert.equal(orderBook[0].ticker, 'TW')
@@ -79,7 +79,7 @@ test3('Two tradable orders result in a trade Given an empty orderbook for "TW"',
   assert.equal(orderBook[1].status, 'Completed')
 
   let parsedResponse2 = JSON.parse(response2)
-  log(`\n\ntrade=== ${JSON.stringify(parsedResponse2)}`)
+  // log(`\n\ntrade= ${JSON.stringify(parsedResponse2)}`)
   assert.equal(parsedResponse2.trades[0].ticker, 'TW')
   assert.equal(parsedResponse2.trades[0].price, 9950)
   assert.equal(parsedResponse2.trades[0].quantity, 100)

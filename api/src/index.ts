@@ -46,7 +46,7 @@ const cancel = (userName: string, id: string): string => {
     log(`Market.cancel: Order with id: ${id} canceled`)
     return JSON.stringify({ Result: 'Success' })
   } catch (e) {
-    log(`Market.cancel:(2) unexpected error, order: ${id}`)
+    log(`Market.cancel: Unexpected error, order: ${id}`)
   }
   return JSON.stringify({ Result: 'Unexpected Error' })
 }
