@@ -14,7 +14,7 @@ const find = (id: string): string => {
   return JSON.stringify({ Result: 'Unexpected Error' })
 }
 
-const bid = (
+const post = (
   userName: string,
   ticker: string,
   side: string,
@@ -27,11 +27,11 @@ const bid = (
   try {
     let response = OrderBook.match(order)
     if (!response.trades || response.trades.length === 0) {
-      log(`Market.bid: No Trade, orderId: ${order.id}`)
+      log(`Market.post: No Trade, orderId: ${order.id}`)
     }
     return JSON.stringify(response)
   } catch (e) {
-    log(`Market.bid: (1) unexpected error, order: ${order}, error: ${e}`)
+    log(`Market.post: (1) unexpected error, order: ${order}, error: ${e}`)
   }
   return JSON.stringify({ result: 'Unexpected Error' })
 }
@@ -59,4 +59,4 @@ function clearAll (): void {
   OrderBooks.clearAll()
 }
 
-export { find, bid, cancel, getAll, clearAll }
+export { find, post, cancel, getAll, clearAll }

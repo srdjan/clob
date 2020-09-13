@@ -7,7 +7,7 @@ const log = console.log
 
 const test1 = suite('Acceptance test1')
 test1('A single valid order is accepted into the limit order book Given an empty orderbook for "TW"', () => {
-  let response = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
+  let response = Clob.post('trader1', 'TW', 'Buy', 9950, 100)
   let result = JSON.parse(response) as MarketResponse
   
   assert.equal(result.order.ticker, 'TW')
@@ -19,8 +19,8 @@ test1.run()
 
 const test2 = suite('Acceptance test2')
 test2('Multiple valid orders are accepted into the limit order book Given an empty orderbook for "TW"', () => {
-  let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
-  let response2 = Clob.bid('trader2', 'TW', 'Sell', 9960, 200)
+  let response1 = Clob.post('trader1', 'TW', 'Buy', 9950, 100)
+  let response2 = Clob.post('trader2', 'TW', 'Sell', 9960, 200)
   let orderBook = Clob.getAll('TW')
   // console.log(`\n\ORDERBOOK: ${JSON.stringify(orderBook)}`)
   assert.equal(orderBook.length, 2)
@@ -51,8 +51,8 @@ test2.run()
 
 const test3 = suite('Acceptance test3')
 test3('Two tradable orders result in a trade Given an empty orderbook for "TW"', () => {
-  let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
-  let response2 = Clob.bid('trader2', 'TW', 'Sell', 9950, 100)
+  let response1 = Clob.post('trader1', 'TW', 'Buy', 9950, 100)
+  let response2 = Clob.post('trader2', 'TW', 'Sell', 9950, 100)
 
   let orderBook = Clob.getAll('TW')
   assert.equal(orderBook.length, 2)
@@ -92,8 +92,8 @@ test3.run()
 const test4 = suite('Acceptance test4')
 test4('Two tradable orders with different quantities are partially filled Given an empty orderbook for "TW"',
   () => {
-    let response1 = Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
-    let response2 = Clob.bid('trader2', 'TW', 'Sell', 9950, 300)
+    let response1 = Clob.post('trader1', 'TW', 'Buy', 9950, 100)
+    let response2 = Clob.post('trader2', 'TW', 'Sell', 9950, 300)
     let orderBook = Clob.getAll('TW')
 
     assert.equal(orderBook.length, 2)
@@ -133,10 +133,10 @@ test4.run()
 const test5 = suite('Acceptance test5')
 test5('A valid single order is able to sweep the book Given an empty orderbook for "TW"',
   () => {
-    Clob.bid('trader1', 'TW', 'Buy', 9950, 100)
-    Clob.bid('trader2', 'TW', 'Buy', 9945, 300)
-    Clob.bid('trader3', 'TW', 'Buy', 9935, 500)
-    Clob.bid('trader4', 'TW', 'Sell', 9930, 1000)
+    Clob.post('trader1', 'TW', 'Buy', 9950, 100)
+    Clob.post('trader2', 'TW', 'Buy', 9945, 300)
+    Clob.post('trader3', 'TW', 'Buy', 9935, 500)
+    Clob.post('trader4', 'TW', 'Sell', 9930, 1000)
 
     let ob = Clob.getAll('TW')
     assert.equal(ob.length, 4)

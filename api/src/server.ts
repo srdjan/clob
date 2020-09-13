@@ -35,7 +35,7 @@ uWS
         }
         case 'buy': {
           log(`Buy order for ${req.data.ticker}, limit: ${req.data.limit}`)
-          let result = Market.bid(
+          let result = Market.post(
             req.data.user,
             req.data.ticker,
             req.data.side,
@@ -47,7 +47,7 @@ uWS
         }
         case 'sell': {
           log(`Buy order for ${req.data.ticker}, limit: ${req.data.limit}`)
-          let result = Market.bid(
+          let result = Market.post(
             req.data.user,
             req.data.ticker,
             req.data.side,
