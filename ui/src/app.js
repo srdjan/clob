@@ -38,8 +38,9 @@ const App = () => {
       ws.current.send(JSON.stringify({ msg: 'sub' }))
     }
     ws.current.onmessage = event => {
+      console.log(`!!! onmessage: ${event.data}`)
       const response = JSON.parse(event.data)
-      setOrderBook(response.data)
+      setOrderBook(response)
     }
     ws.current.onclose = () => ws.close()
 

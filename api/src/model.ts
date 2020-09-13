@@ -48,9 +48,12 @@ type Trade = {
   message: string
 }
 
+type OrderTicker = {
+  orders: Array<{limit: number, quantity: number}>,
+}
 type MarketResponse = {
-  order: IOrder,
-  trades: Trade[]
+  order: IOrder
+  trade: Trade
 }
 
-export { Ticker, Side, Status, IOrder, IOrderId, OrderBooks, OrderBook, OrderBookSide, Trade, Traders, Trader, MarketResponse }
+export { Ticker, Side, Status, IOrder, IOrderId, OrderBooks, OrderBook, OrderTicker, OrderBookSide, Trade, Traders, Trader, MarketResponse }

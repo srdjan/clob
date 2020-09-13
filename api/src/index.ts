@@ -26,8 +26,8 @@ const post = (
 
   try {
     let response = OrderBook.match(order)
-    if (!response.trades || response.trades.length === 0) {
-      log(`Market.post: No Trade, orderId: ${order.id}`)
+    if (response.trade.price === 0) {
+      log(`Market.post: No Trade for orderId: ${order.id}`)
     }
     return JSON.stringify(response)
   } catch (e) {

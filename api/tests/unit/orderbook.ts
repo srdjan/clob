@@ -124,7 +124,7 @@ test8('Fail a self trade', () => {
 
   let sellResponse = OrderBook.match(newOrder('joe', 'TW', 'Sell', 10, 100))
   log(`sellResponse: ${JSON.stringify(sellResponse)}`)
-  assert.equal(sellResponse.trades, [])
+  assert.equal(sellResponse.trade.price, 0)
 })
 test8.after(() => OrderBooks.clearAll())
 test8.run()

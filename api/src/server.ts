@@ -42,7 +42,10 @@ uWS
             req.data.limit,
             req.data.quantity
           )
-          ws.publish(`clob/${req.ticker}`, result)
+          if(result) {  //todo: this is always true, need better result here not get/return ticke rif it didn't change
+            Market.getAll(req.data.ticker)
+            ws.publish(`clob/${req.ticker}`, result)
+          }
           break
         }
         case 'sell': {
