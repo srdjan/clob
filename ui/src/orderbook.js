@@ -1,29 +1,39 @@
 import React from 'react'
 
-const OrderBook = ({orders}) => {
-  const head = title => (
-    <thead>
-      <tr>
-        <th className={title} colSpan='2'>{title}</th>
-      </tr>
-    </thead>
-  )
-
-  const rows = arr => arr && arr.map((item, index) => (
+const OrderBook = ({ buys, sells }) => {
+  const rows = arr =>
+    arr &&
+    arr.map((item, index) => (
       <tr key={index}>
-        <td> {item[1]} </td>
-        <td> {item[0]} </td>
+        <td> ${item} </td>
       </tr>
-    )
-  )
+    ))
 
-  return ( 
-    <div className='container'>
-      <table className='item'>
-        {head('Buy ..................................................... Sell')}
-        <tbody>{rows(orders)}</tbody>
-      </table>
-    </div>
+  return (
+    <table width='100%'>
+      <tr>
+        <td valign='top'>
+          <table>
+            <thead className='Buy'>
+              <tr>
+                <th>Buy</th>
+              </tr>
+            </thead>
+            <tbody>{rows(buys)}</tbody>
+          </table>
+        </td>
+        <td valign='top'>
+          <table>
+            <thead className='Buy'>
+              <tr>
+                <th>Sell</th>
+              </tr>
+            </thead>
+            <tbody>{rows(sells)}</tbody>
+          </table>
+        </td>
+      </tr>
+    </table>
   )
 }
 

@@ -49,8 +49,10 @@ type Trade = {
 }
 
 type OrderTicker = {
-  orders: Array<{limit: number, quantity: number}>,
+  buys: Array<{limit: number, quantity: number}>,
+  sells: Array<{limit: number, quantity: number}>
 }
+
 type MarketResponse = {
   order: IOrder
   trade: Trade

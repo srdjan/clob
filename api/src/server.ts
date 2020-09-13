@@ -2,26 +2,6 @@ const uWS = require('uWebSockets.js')
 import * as Market from './index'
 import { log } from './utils'
 
-/*  spec: in-message format def:
-  ----------------------------
-  type Request = {
-    msg: string
-    data: {
-      ticker: Ticker
-      side: Side
-      limit: number
-      quantity: number
-    }
-  }
-  
-  out-message format def:
-  ----------------------------
-  type Response = {
-    data: Array<{limit: number, quantity: number}>
-  }
-*/
-
-
 uWS
   .App()
   .ws('/*', {
@@ -42,10 +22,10 @@ uWS
             req.data.limit,
             req.data.quantity
           )
-          if(result) {  //todo: this is always true, need better result here not get/return ticke rif it didn't change
-            Market.getAll(req.data.ticker)
-            ws.publish(`clob/${req.ticker}`, result)
-          }
+          //todo: need better error handling
+          //todo: get only Buy side (perf)
+          result = Market.getTicker(req.data.ticker)
+          ws.publish(`clob/${req.ticker}`, result)
           break
         }
         case 'sell': {
@@ -57,6 +37,9 @@ uWS
             req.data.limit,
             req.data.quantity
           )
+          //todo: need better error handling
+          //todo: get only SELL side (perf)
+          result = Market.getTicker(req.data.ticker)
           ws.publish(`clob/${req.ticker}`, result)
           break
         }

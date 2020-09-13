@@ -1,4 +1,4 @@
-import { IOrder, OrderBooks, OrderBook, Ticker } from './model'
+import { IOrder, OrderBooks, OrderBook, OrderTicker, Ticker } from './model'
 import { getEmptyOrder } from './order'
 import OrderId from './orderid'
 import { log } from './utils'
@@ -9,6 +9,18 @@ const _sortAscByLimit = (a: any, b: any) =>
   (a[1].limit > b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 const _sortDscByLimit = (a: any, b: any) =>
   (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
+
+function getTicker (ticker: Ticker): OrderTicker {
+  let orderBook = OrderBooks.get(ticker)
+  if (!orderBook) {
+    log(`OrderBooks.getTicker: initiate new OrderBook for: ${ticker}`)
+    return { buys: [], sells: [] } 
+  }
+  return { 
+    buys: Array.from(orderBook.buySide.values()).sort((a,b) => b.limit - a.limit), 
+    sells: Array.from(orderBook.sellSide.values()).sort((a,b) => a.limit - b.limit)
+  }
+}
 
 function getAll (ticker: Ticker): IOrder[] {
   let orderBook = OrderBooks.get(ticker)
@@ -105,12 +117,14 @@ function insert (order: IOrder): OrderBook {
   if (orderBook && order.side === 'Buy') {
     orderBook.buySide.set(order.id, order)
     let sorted = new Map([...orderBook.buySide].sort(_sortAscByLimit))
+    log(`sorted buys: ${JSON.stringify(sorted.entries())}`)
     orderBook.buySide = sorted
   }
 
   if (orderBook && order.side === 'Sell') {
     orderBook.sellSide.set(order.id, order)
     let sorted = new Map([...orderBook.sellSide].sort(_sortDscByLimit))
+    log(`sorted sells: ${JSON.stringify(sorted.entries())}`)
     orderBook.sellSide = sorted
   }
 
@@ -121,4 +135,4 @@ function clearAll(): void {
   OrderBooks.clear()
 }
 
-export { getAll, get, insert, update, cancel, clearAll }
+export { getAll, getTicker, get, insert, update, cancel, clearAll }
