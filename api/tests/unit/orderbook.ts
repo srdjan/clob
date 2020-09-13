@@ -51,8 +51,8 @@ test2.run()
 const test3 = suite()
 test3('cancel order', () => {
   let buyResponse = OrderBook.match(newOrder('joe', 'TW', 'Buy', 10, 100))
-  let buyOrder = OrderBooks.getOrder(buyResponse.order.id)
-  let canceledOrder = OrderBooks.cancelOrder(buyOrder.id)
+  let buyOrder = OrderBooks.get(buyResponse.order.id)
+  let canceledOrder = OrderBooks.cancel(buyOrder.id)
   assert.equal(canceledOrder, true)
 })
 test3.after(() => OrderBooks.clearAll())
@@ -136,7 +136,7 @@ test9('Complete a multiple matching trades on one Sell trade', () => {
   OrderBook.match(newOrder('trader3', 'TW', 'Buy', 9935, 500))
   OrderBook.match(newOrder('trader4', 'TW', 'Sell', 9930, 1000))
 
-  let ob = OrderBooks.getOrders('TW')
+  let ob = OrderBooks.getAll('TW')
   assert.equal(ob.length, 4)
 
   showOrders(ob)

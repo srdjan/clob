@@ -5,7 +5,7 @@ import { log, TradeId } from './utils'
 
 function match (order: IOrder): MarketResponse {
   let trades = new Array<Trade>()
-  let orderBook = Engine.insertOrder(order)
+  let orderBook = Engine.insert(order)
 
   let orderBookSide = order.side === 'Buy' ? orderBook.sellSide : orderBook.buySide
   if (orderBookSide.size === 0) {
@@ -65,10 +65,8 @@ function match (order: IOrder): MarketResponse {
       matchOrder.filledQuantity = matchOrder.quantity
     }
 
-    Engine.updateOrder(orderBook, order)
-    log(`\n\nOrderbook.match: updated order ${JSON.stringify(order)}`)
-    Engine.updateOrder(orderBook, matchOrder)
-    log(`\n\nOrderbook.match: updated matchOrder ${JSON.stringify(matchOrder)}`)
+    Engine.update(orderBook, order)
+    Engine.update(orderBook, matchOrder)
   }
   
   return { order, trades }

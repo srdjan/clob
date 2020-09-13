@@ -7,7 +7,7 @@ import { log } from './utils'
 
 const find = (id: string): string => {
   try {
-    return JSON.stringify(OrderBooks.getOrder(id))
+    return JSON.stringify(OrderBooks.get(id))
   } catch (e) {
     log(`Market.find: unexpected error, orderId: ${id}`)
   }
@@ -40,7 +40,7 @@ const cancel = (userName: string, id: string): string => {
   try {
     Traders.verify(userName)
 
-    if (!OrderBooks.cancelOrder(id)) {
+    if (!OrderBooks.cancel(id)) {
       throw new Error(`Market.cancel: Order for id: ${id} not found`)
     }
     log(`Market.cancel: Order with id: ${id} canceled`)
@@ -52,7 +52,7 @@ const cancel = (userName: string, id: string): string => {
 }
 
 function getAll (ticker: string): IOrder[] {
-  return Array.from(OrderBooks.getOrders(ticker as Ticker))
+  return Array.from(OrderBooks.getAll(ticker as Ticker))
 }
 
 function clearAll (): void {

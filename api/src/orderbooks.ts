@@ -10,10 +10,10 @@ const _sortAscByLimit = (a: any, b: any) =>
 const _sortDscByLimit = (a: any, b: any) =>
   (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 
-function getOrders (ticker: Ticker): IOrder[] {
+function getAll (ticker: Ticker): IOrder[] {
   let orderBook = OrderBooks.get(ticker)
   if (!orderBook) {
-    log(`OrderBooks.getOrders: First time around for ticker: ${ticker}, Creating new OrderBook`)
+    log(`OrderBooks.getAll: First time around for ticker: ${ticker}, Creating new OrderBook`)
     OrderBooks.set(ticker, {
       buySide: new Map<string, IOrder>(),
       sellSide: new Map<string, IOrder>()
@@ -35,7 +35,7 @@ function getOrders (ticker: Ticker): IOrder[] {
   return sorted
 }
 
-const getOrder = (id: string): IOrder => {
+const get = (id: string): IOrder => {
   let orderId = OrderId.fromString(id) //validate
   let orderBook = OrderBooks.get(orderId.ticker)
   if (!orderBook) {
@@ -56,8 +56,8 @@ const getOrder = (id: string): IOrder => {
   return order
 }
 
-function cancelOrder (id: string): boolean {
-  let order = getOrder(id)
+function cancel (id: string): boolean {
+  let order = get(id)
   if (!order) {
     throw new Error(`Orderbook.cancelOrderById: Order for id:${id} not found`)
   }
@@ -69,10 +69,10 @@ function cancelOrder (id: string): boolean {
     )
   }
 
-  return _removeOrder(orderBook, order)
+  return _remove(orderBook, order)
 }
 
-function _removeOrder (orderBook: OrderBook, order: IOrder): boolean {
+function _remove (orderBook: OrderBook, order: IOrder): boolean {
   order.cancel()
 
   if (order.side === 'Buy') {
@@ -87,7 +87,7 @@ function _removeOrder (orderBook: OrderBook, order: IOrder): boolean {
   return true
 }
 
-function updateOrder (orderBook: OrderBook, order: IOrder): void {
+function update (orderBook: OrderBook, order: IOrder): void {
   order.update()
 
   if (orderBook && order.side === 'Buy') {
@@ -99,9 +99,9 @@ function updateOrder (orderBook: OrderBook, order: IOrder): void {
   }
 }
 
-function insertOrder (order: IOrder): OrderBook {
+function insert (order: IOrder): OrderBook {
   if (!OrderBooks.has(order.ticker)) {
-    log(`Orderbooks.insertOrder: initiate new OrderBook for ticker: ${order.ticker}`)
+    log(`Orderbooks.insert: initiate new OrderBook for ticker: ${order.ticker}`)
     OrderBooks.set(order.ticker, {
       buySide: new Map<string, IOrder>(),
       sellSide: new Map<string, IOrder>()
@@ -128,4 +128,4 @@ function clearAll(): void {
   OrderBooks.clear()
 }
 
-export { getOrders, getOrder, insertOrder, updateOrder, cancelOrder, clearAll }
+export { getAll, get, insert, update, cancel, clearAll }
