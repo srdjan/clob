@@ -1,11 +1,16 @@
 import React from 'react'
 import OrderBook from './orderbook'
+import {TradeForm} from './tradeform'
 
 const App = () => {
   return (
-    <div>
-      <h2><b>C</b>entral <b>L</b>imit <b>O</b>rder <b>B</b>ook</h2>
-      <OrderBook />
+    <div className='container'>
+      <div className='item form'>
+       <TradeForm/>
+      </div>
+      <div className='item'>
+        <OrderBook />
+      </div>
     </div>
   )
 }

@@ -39,6 +39,7 @@ uWS
           )
 
           let result = Market.bid('elen', 'TW', 'Buy', 1100, 10)
+          
           ws.publish(`clob/${order.ticker}`, result)
           break
         }

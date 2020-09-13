@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react'
 
-//spec: in-message format def:
-//----------------------------
-// type OrderReq = {
-//   msg: string
-//   ticker: Ticker
-//   side: Side
-//   limit: number
-//   quantity: number
-// }
-//
-// out-message format def:
-//----------------------------
-// type OrderResp = {
-//   result: string 
-//   orderbook: {
-//     bids: Array<{limit: number, quantity: number}>
-//     asks: Array<{limit: number, quantity: number}>
-//   }
-// }
+/*  spec: in-message format def:
+  ----------------------------
+  type OrderReq = {
+    msg: string
+    ticker: Ticker
+    side: Side
+    limit: number
+    quantity: number
+  }
+  
+  out-message format def:
+  ----------------------------
+  type OrderResp = {
+    result: string 
+    orderbook: {
+      bids: Array<{limit: number, quantity: number}>
+      asks: Array<{limit: number, quantity: number}>
+    }
+  }
+*/
 
 const OrderBook = () => {
-  const [orders, setOrders] = useState([])
+  const [orderBook, setOrderBook] = useState({orders: [[100, 102],[99, 103],[98, 104]]})
+  console.log(`orderBook: ${JSON.stringify(orderBook)}`)
+
   const ticker = 'TW'
 
   useEffect(() => {
@@ -31,14 +34,15 @@ const OrderBook = () => {
     }
     ws.onmessage = event => {
       const response = JSON.parse(event.data)
-      setOrders(response.data)
+       setOrderBook(response.data)
     }
     ws.onclose = () => ws.close()
 
     return () => ws.close()
   }, [ticker])
 
-  const { bids, asks } = orders
+  const { orders } = orderBook
+ 
   const head = title => (
     <thead>
       <tr>
@@ -56,15 +60,10 @@ const OrderBook = () => {
   )
 
   return ( 
-    <div className='order-container'>
+    <div className='container'>
       <table>
-        {head('Bids')}
-        <tbody>{rows(bids)}</tbody>
-      </table>
-
-      <table>
-        {head('Asks')}
-        <tbody>{rows(asks)}</tbody>
+        {head('Buy ..................................................... Sell')}
+        <tbody>{rows(orders)}</tbody>
       </table>
     </div>
   )
