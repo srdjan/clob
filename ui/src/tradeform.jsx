@@ -9,11 +9,7 @@ const defaultValues = {
   quantity: 100,
 };
 
-function onSubmit(data) {
-  console.log(`data: ${JSON.stringify(data)}`)
-}
-
-const TradeForm = () => {
+const TradeForm = ({onSubmit}) => {
   const { data } = useForm();
   console.log(data);
   return (

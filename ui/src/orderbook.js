@@ -1,49 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { TradeForm } from './tradeform'
+import React from 'react'
 
-/*  spec: in-message format def:
-  ----------------------------
-  type OrderReq = {
-    msg: string
-    ticker: Ticker
-    side: Side
-    limit: number
-    quantity: number
-  }
-  
-  out-message format def:
-  ----------------------------
-  type OrderResp = {
-    result: string 
-    orderbook: {
-      bids: Array<{limit: number, quantity: number}>
-      asks: Array<{limit: number, quantity: number}>
-    }
-  }
-*/
-
-const OrderBook = () => {
-  const [orderBook, setOrderBook] = useState({orders: [[100, 102],[99, 103],[98, 104]]})
-  console.log(`orderBook: ${JSON.stringify(orderBook)}`)
-
-  const ticker = 'TW'
-
-  useEffect(() => {
-    const ws = new WebSocket('ws://localhost:9001')
-    ws.onopen = () => {
-      ws.send(JSON.stringify({msg: 'sub'}))
-    }
-    ws.onmessage = event => {
-      const response = JSON.parse(event.data)
-       setOrderBook(response.data)
-    }
-    ws.onclose = () => ws.close()
-
-    return () => ws.close()
-  }, [ticker])
-
-  const { orders } = orderBook
- 
+const OrderBook = ({orders}) => {
   const head = title => (
     <thead>
       <tr>

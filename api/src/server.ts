@@ -2,54 +2,59 @@ const uWS = require('uWebSockets.js')
 import * as Market from './index'
 import { log } from './utils'
 
-//spec: in-message format def:
-//----------------------------
-// type OrderReq = {
-//   msg: string
-//   ticker: Ticker
-//   side: Side
-//   limit: number
-//   quantity: number
-// }
-//
-// out-message format def:
-//----------------------------
-// type OrderResp = {
-//   result: string
-//   orderbook: {
-//     bids: Array<{limit: number, quantity: number}>
-//     asks: Array<{limit: number, quantity: number}>
-//   }
-// }
+/*  spec: in-message format def:
+  ----------------------------
+  type Request = {
+    msg: string
+    data: {
+      ticker: Ticker
+      side: Side
+      limit: number
+      quantity: number
+    }
+  }
+  
+  out-message format def:
+  ----------------------------
+  type Response = {
+    data: Array<{limit: number, quantity: number}>
+  }
+*/
+
 
 uWS
   .App()
   .ws('/*', {
-    message: (ws: any, message: ArrayBuffer, isBinary: boolean) => {
-      const order = JSON.parse(Buffer.from(message).toString('utf8'))
-      switch (order.msg) {
+    message: (ws: any, request: ArrayBuffer, isBinary: boolean) => {
+      const req = JSON.parse(Buffer.from(request).toString('utf8'))
+      switch (req.msg) {
         case 'sub': {
-          log(`Subscribe msg received: ${order.msg}`)
+          log(`Subscribe msg received: ${req.msg}`)
           ws.subscribe(`clob/#`) // Subscribe to all topics (tickers)
           break
         }
         case 'buy': {
-          log(
-            `Buy order for ${order.ticker}, limit: ${order.limit}, quntity: ${order.quantity}`
+          log(`Buy order for ${req.data.ticker}, limit: ${req.data.limit}`)
+          let result = Market.bid(
+            req.data.user,
+            req.data.ticker,
+            req.data.side,
+            req.data.limit,
+            req.data.quantity
           )
-
-          let result = Market.bid('elen', 'TW', 'Buy', 1100, 10)
-          
-          ws.publish(`clob/${order.ticker}`, result)
+          ws.publish(`clob/${req.ticker}`, result)
           break
         }
         case 'sell': {
-          log(
-            `Sell order for ${order.ticker}, limit: ${order.limit}, quntity: ${order.quantity}`
+          log(`Buy order for ${req.data.ticker}, limit: ${req.data.limit}`)
+          let result = Market.bid(
+            req.data.user,
+            req.data.ticker,
+            req.data.side,
+            req.data.limit,
+            req.data.quantity
           )
-
-          let result = Market.bid('elen', 'TW', 'Sell', 1201, 20)
-          ws.publish(`clob/${order.ticker}`, result)
+          ws.publish(`clob/${req.ticker}`, result)
           break
         }
       }
