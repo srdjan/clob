@@ -52,7 +52,7 @@ const cancel = (userName: string, id: string): string => {
 }
 
 function getTicker (ticker: string): string {
-  let orderBooks = OrderBooks.getTicker(ticker as Ticker)
+  let orderBooks = OrderBooks.getOrderBook(ticker as Ticker)
   let buys = orderBooks.buys.map(o => `${o.limit},${o.quantity}`)
   let sells = orderBooks.sells.map(o => `${o.limit},${o.quantity}`)
 
@@ -60,11 +60,11 @@ function getTicker (ticker: string): string {
 }
 
 function getAll (ticker: string): IOrder[] {
-  return Array.from(OrderBooks.getAll(ticker as Ticker))
+  return Array.from(OrderBooks.getOrderHistory(ticker as Ticker))
 }
 
 function clearAll (): void {
   OrderBooks.clearAll()
 }
 
-export { find, post, cancel, getAll, getTicker, clearAll }
+export { find, post, cancel, getAll as getOrderHistory, getTicker, clearAll }

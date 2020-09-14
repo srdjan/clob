@@ -10,7 +10,7 @@ const _sortAscByLimit = (a: any, b: any) =>
 const _sortDscByLimit = (a: any, b: any) =>
   (a[1].limit < b[1].limit && 1) || (a[1].limit === b[1].limit ? 0 : -1)
 
-function getTicker (ticker: Ticker): OrderTicker {
+function getOrderBook (ticker: Ticker): OrderTicker {
   let orderBook = OrderBooks.get(ticker)
   if (!orderBook) {
     log(`OrderBooks.getTicker: initiate new OrderBook for: ${ticker}`)
@@ -22,7 +22,7 @@ function getTicker (ticker: Ticker): OrderTicker {
   }
 }
 
-function getAll (ticker: Ticker): IOrder[] {
+function getOrderHistory (ticker: Ticker): IOrder[] {
   let orderBook = OrderBooks.get(ticker)
   if (!orderBook) {
     log(`OrderBooks.getAll: initiate new OrderBook for: ${ticker}`)
@@ -135,4 +135,4 @@ function clearAll(): void {
   OrderBooks.clear()
 }
 
-export { getAll, getTicker, get, insert, update, cancel, clearAll }
+export { getOrderHistory, getOrderBook, get, insert, update, cancel, clearAll }
