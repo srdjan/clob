@@ -16,10 +16,16 @@ function getOrderBook (ticker: Ticker): OrderTicker {
     log(`OrderBooks.getTicker: initiate new OrderBook for: ${ticker}`)
     return { buys: [], sells: [] } 
   }
-  return { 
-    buys: Array.from(orderBook.buySide.values()).sort((a,b) => b.limit - a.limit), 
-    sells: Array.from(orderBook.sellSide.values()).sort((a,b) => a.limit - b.limit)
-  }
+  let buys = Array.from(orderBook.buySide.values()).sort((a,b) => b.limit - a.limit)
+  let sells = Array.from(orderBook.sellSide.values()).sort((a,b) => a.limit - b.limit)
+  
+  let openBuys = buys.filter(o => o.status === 'Open')
+  log(`OPEN BUYS: ${JSON.stringify(openBuys)}`)
+
+  let openSells = sells.filter(o => o.status === 'Open')
+  log(`OPEN SELLS: ${JSON.stringify(openSells)}`)
+
+  return { buys: openBuys, sells: openSells }
 }
 
 function getOrderHistory (ticker: Ticker): IOrder[] {

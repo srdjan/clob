@@ -15,8 +15,7 @@ function match (order: IOrder): MarketResponse {
   }
 
   let openOrders = Array.from(orderBookSide.values()).filter(
-    o => o.status === 'Open'
-  )
+    o => o.status === 'Open' && o.trader.username !== order.trader.username  )
   for (let matchOrder of openOrders) {
     if (matchOrder.status !== 'Open') {
       continue

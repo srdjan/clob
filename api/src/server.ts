@@ -14,7 +14,7 @@ uWS
           break
         }
         case 'buy': {
-          log(`Buy order for ${req.data.ticker}, limit: ${req.data.limit}`)
+          log(`Buy order for ${req.data.user} ${req.data.ticker}, limit: ${req.data.limit}`)
           let result = Market.post(
             req.data.user,
             req.data.ticker,
@@ -24,7 +24,7 @@ uWS
           )
           //todo: need better error handling
           //todo: get only Buy side (perf)
-          result = Market.getTicker(req.data.ticker)
+          result = Market.getOrderBook(req.data.ticker)
           ws.publish(`clob/${req.ticker}`, result)
           break
         }
@@ -39,7 +39,7 @@ uWS
           )
           //todo: need better error handling
           //todo: get only SELL side (perf)
-          result = Market.getTicker(req.data.ticker)
+          result = Market.getOrderBook(req.data.ticker)
           ws.publish(`clob/${req.ticker}`, result)
           break
         }

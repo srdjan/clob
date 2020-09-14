@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Field, useForm } from "@leveluptuts/fresh"
 
 const defaultValues = {
-  name: "trader1",
+  user: "trader1",
   ticker: "TW",
   side: "Buy",
   limit: 100,
@@ -20,7 +20,7 @@ const TradeForm = ({onSubmit}) => {
         onSubmit={onSubmit}
         defaultValues={defaultValues}
       >
-        <Field>Name</Field>
+        <Field>User</Field>
         <Field>Ticker</Field>
         <Field>Side</Field>
         <Field>Limit</Field>

@@ -8,7 +8,7 @@ const App = () => {
   console.log(`orderBook: ${JSON.stringify(orderBook)}`)
 
   function onSubmit (data) {
-    console.log(`data: ${JSON.stringify(data)}`)
+    console.log(`Form data: ${JSON.stringify(data)}`)
     ws.current.send(JSON.stringify({ msg: 'buy', data: data }))
   }
 

@@ -15,13 +15,15 @@ const find = (id: string): string => {
 }
 
 const post = (
-  userName: string,
+  username: string,
   ticker: string,
   side: string,
   limit: number,
   quantity: number
 ): string => {
-  let trader = Traders.getOrCreate(userName)
+  log(`USERNAME: ${username}`)
+
+  let trader = Traders.getOrCreate(username)
   let order = new Order(trader, ticker as Ticker, side as Side, limit, quantity)
 
   try {
@@ -51,7 +53,7 @@ const cancel = (userName: string, id: string): string => {
   return JSON.stringify({ Result: 'Unexpected Error' })
 }
 
-function getTicker (ticker: string): string {
+function getOrderBook (ticker: string): string {
   let orderBooks = OrderBooks.getOrderBook(ticker as Ticker)
   let buys = orderBooks.buys.map(o => `${o.limit},${o.quantity}`)
   let sells = orderBooks.sells.map(o => `${o.limit},${o.quantity}`)
@@ -59,7 +61,7 @@ function getTicker (ticker: string): string {
   return JSON.stringify({buys, sells})
 }
 
-function getAll (ticker: string): IOrder[] {
+function getOrderHistory (ticker: string): IOrder[] {
   return Array.from(OrderBooks.getOrderHistory(ticker as Ticker))
 }
 
@@ -67,4 +69,4 @@ function clearAll (): void {
   OrderBooks.clearAll()
 }
 
-export { find, post, cancel, getAll as getOrderHistory, getTicker, clearAll }
+export { find, post, cancel, getOrderHistory, getOrderBook, clearAll }
