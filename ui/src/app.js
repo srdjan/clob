@@ -4,7 +4,7 @@ import { TradeForm } from './tradeform'
 
 const App = () => {
   const ws = useRef(null)
-  const [orderBook, setOrderBook] = useState({buys: [], sells: [] })
+  const [orderBook, setOrderBook] = useState({ buys: [], sells: [] })
   console.log(`orderBook: ${JSON.stringify(orderBook)}`)
 
   function onSubmit (data) {
@@ -34,20 +34,13 @@ const App = () => {
 
   return (
     <div className='wrapper'>
-      <header className='header'>
-        <ul className='navigation'>
-          <li>
-            <a href='/'>CLOB</a>
-          </li>
-        </ul>
-      </header>
+      <ul className='navigation'>C.L.O.B.</ul>
       <article className='main'>
         <OrderBook buys={buys} sells={sells} />
       </article>
       <aside className='aside aside-1'>
         <TradeForm onSubmit={onSubmit} />
       </aside>
-      <footer className='footer'></footer>
     </div>
   )
 }

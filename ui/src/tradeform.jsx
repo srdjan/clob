@@ -5,8 +5,8 @@ const defaultValues = {
   name: "trader1",
   ticker: "TW",
   side: "Buy",
-  limit: 1233,
-  quantity: 100,
+  limit: 100,
+  quantity: 10,
 };
 
 const TradeForm = ({onSubmit}) => {

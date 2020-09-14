@@ -10,26 +10,26 @@ const OrderBook = ({ buys, sells }) => {
     ))
 
   return (
-    <table width='100%'>
+    <table>
       <tr>
         <td valign='top'>
           <table>
-            <thead className='Buy'>
+            <thead>
               <tr>
-                <th>Buy</th>
+                <th>Buy [Price,Size]</th>
               </tr>
             </thead>
-            <tbody>{rows(buys)}</tbody>
+            <tbody className='buy'>{rows(buys)}</tbody>
           </table>
         </td>
         <td valign='top'>
           <table>
-            <thead className='Buy'>
+            <thead>
               <tr>
-                <th>Sell</th>
+                <th>Sell [Price, Size]</th>
               </tr>
             </thead>
-            <tbody>{rows(sells)}</tbody>
+            <tbody className='sell'>{rows(sells)}</tbody>
           </table>
         </td>
       </tr>
