@@ -35,16 +35,19 @@ npm run i
 npm start
 ```
 
-### To run the application, use two different command shells. First start the services:
+## Run the application
+Use two different command shells. First start the services:
 ```
 [clob]> cd api
 [clob/api]> npm start
-
+```
+### ... and then the frontend:
+```sh
 [clob/api]> cd ../ui
 [clob/ui]> npm start
 ```
 
-## CLI [todo]
+## CLI [TODO]
 ```
 $ cli --help
 cli
