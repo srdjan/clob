@@ -27,7 +27,7 @@ npm run test:accept
 ```
 for acceptance tests.
 
-## UI [todo]
+## UI
 For UI development change directory to ./ui, install dependencies and build the project:
 ```sh
 cd ui
