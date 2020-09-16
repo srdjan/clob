@@ -7,22 +7,17 @@ It accepts orders via an REST API via UI or CLi clients and publishes updates on
 
 ## API
 1) Start by cloning the repo locally and navigate to newly created folder:
-
 ```sh
 git clone https://github.com/srdjan/clob.git   
 cd clob
 ```
-
 2)  Next, for API development change directory to ./api, install dependencies and build the project:
-
 ```sh
 cd api/
 npm i
 npm run build
 ```
-
 3) On a succesful build, try running tests:
-
 ```sh
 npm run test:unit
 ```
@@ -30,8 +25,24 @@ for unit tests, or:
 ```
 npm run test:accept
 ```
-
 for acceptance tests.
+
+## UI [todo]
+For UI development change directory to ./ui, install dependencies and build the project:
+```sh
+cd ui
+npm run i
+npm start
+```
+
+### To run the application, use two different command shells. First start the services:
+```
+[clob]> cd api
+[clob/api]> npm start
+
+[clob/api]> cd ../ui
+[clob/ui]> npm start
+```
 
 ## CLI [todo]
 ```
@@ -51,15 +62,4 @@ Options:
   --ticker    Ticker symbol                [string]
   --quantity  Number of shares             [string]
   
-```
-
-## UI [todo]
-For UI development change directory to ./ui, install dependencies and build the project:
-```
-[todo]
-```
-
-### To run the application, first start the services, and then the frontend (todo):
-```
-//todo
 ```
