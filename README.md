@@ -47,22 +47,5 @@ Use two different command shells. First start the services:
 [clob/ui]> npm start
 ```
 
-## CLI [TODO]
-```
-$ cli --help
-cli
 
-clob command ...otions
 
-Commands:
-  'buy' 
-  'sell'
-  'cancel'
-  'show'
-
-Options:
-  --name      Name of the trader           [string]
-  --ticker    Ticker symbol                [string]
-  --quantity  Number of shares             [string]
-  
-```
