@@ -54,8 +54,6 @@ class Market implements IMarket {
         limit,
         quantity
       )
-      orderBook.open(order)
-
       let response = orderBook.open(order)
       if (response.trade.price === 0) {
         log(`Market[${this.#name}].postOrder: No Trade for orderId: ${order.id}`)
@@ -112,6 +110,17 @@ class Market implements IMarket {
     }
 
     return orderBook.getOrderHistory()
+  }
+
+  clearAll(userName: string, ticker: string) {
+    Traders.verify(userName)
+
+    let orderBook = orderBooks.get(ticker as Ticker)
+    if (!orderBook) {
+      log(`Market[${this.#name}].getOrderHistory: OrderBook for ticker: ${ticker} not found`)
+      return []
+    }
+    orderBook.clearAll()    
   }
 }
 

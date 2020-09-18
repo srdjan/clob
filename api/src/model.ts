@@ -65,6 +65,7 @@ interface IMarket {
   cancelOrder(userName: string, ticker: Ticker, id: string): boolean 
   getOrderHistory(userName: string, ticker: string): IOrder[] | undefined
   getOrderBook(userName: string, ticker: string): IOrderBook | undefined
+  clearAll(userName: string, ticker: string): void
 }
 
 export { Ticker, Side, Status, IOrder, IOrderId, IOrderBook, IOrderBooks, Trade, Traders, Trader, MarketResponse, IMarket }

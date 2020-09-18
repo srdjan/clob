@@ -1,27 +1,27 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
-import * as Clob from '../../src/index'
+import { Market } from '../../src/index'
 import { MarketResponse } from '../../src/model'
 
+const market = new Market('stock@clob')
 const log = console.log
 
 const test1 = suite('Acceptance test1')
 test1('A single valid order is accepted into the limit order book Given an empty orderbook for "TW"', () => {
-  let response = Clob.post('trader1', 'TW', 'Buy', 9950, 100)
+  let response = market.postOrder('trader1', 'TW', 'Buy', 9950, 100)
   let result = JSON.parse(response) as MarketResponse
   
   assert.equal(result.order.ticker, 'TW')
   assert.equal(result.order.trader.username, 'trader1')
-
+  market.clearAll('trader1', 'TW')
 })
-test1.after(() => Clob.clearAll())
 test1.run()
 
 const test2 = suite('Acceptance test2')
 test2('Multiple valid orders are accepted into the limit order book Given an empty orderbook for "TW"', () => {
-  let response1 = Clob.post('trader1', 'TW', 'Buy', 9950, 100)
-  let response2 = Clob.post('trader2', 'TW', 'Sell', 9960, 200)
-  let orderBook = Clob.getOrderHistory('TW')
+  let response1 = market.postOrder('trader1', 'TW', 'Buy', 9950, 100)
+  let response2 = market.postOrder('trader2', 'TW', 'Sell', 9960, 200)
+  let orderBook = market.getOrderHistory('trader1', 'TW')
   // console.log(`\n\ORDERBOOK: ${JSON.stringify(orderBook)}`)
   assert.equal(orderBook.length, 2)
 
@@ -45,16 +45,17 @@ test2('Multiple valid orders are accepted into the limit order book Given an emp
 
   assert.equal(orderBook[0].status, 'Open')
   assert.equal(orderBook[1].status, 'Open')
+  
+  market.clearAll('trader1', 'TW')
 })
-test2.after(() => Clob.clearAll())
 test2.run()
 
 const test3 = suite('Acceptance test3')
 test3('Two tradable orders result in a trade Given an empty orderbook for "TW"', () => {
-  let response1 = Clob.post('trader1', 'TW', 'Buy', 9950, 100)
-  let response2 = Clob.post('trader2', 'TW', 'Sell', 9950, 100)
+  let response1 = market.postOrder('trader1', 'TW', 'Buy', 9950, 100)
+  let response2 = market.postOrder('trader2', 'TW', 'Sell', 9950, 100)
 
-  let orderBook = Clob.getOrderHistory('TW')
+  let orderBook = market.getOrderHistory('trader1', 'TW')
   assert.equal(orderBook.length, 2)
 
   assert.equal(orderBook[0].ticker, 'TW')
@@ -85,16 +86,17 @@ test3('Two tradable orders result in a trade Given an empty orderbook for "TW"',
   assert.equal(parsedResponse2.trade.quantity, 100)
   assert.equal(parsedResponse2.trade.buyOrder.trader.username, 'trader1')
   assert.equal(parsedResponse2.trade.sellOrder.trader.username, 'trader2')
+  
+  market.clearAll('trader1', 'TW')
 })
-test3.after(() => Clob.clearAll())
 test3.run()
 
 const test4 = suite('Acceptance test4')
 test4('Two tradable orders with different quantities are partially filled Given an empty orderbook for "TW"',
   () => {
-    let response1 = Clob.post('trader1', 'TW', 'Buy', 9950, 100)
-    let response2 = Clob.post('trader2', 'TW', 'Sell', 9950, 300)
-    let orderBook = Clob.getOrderHistory('TW')
+    let response1 = market.postOrder('trader1', 'TW', 'Buy', 9950, 100)
+    let response2 = market.postOrder('trader2', 'TW', 'Sell', 9950, 300)
+    let orderBook = market.getOrderHistory('trader1', 'TW')
 
     assert.equal(orderBook.length, 2)
 
@@ -125,20 +127,21 @@ test4('Two tradable orders with different quantities are partially filled Given 
     assert.equal(trade.quantity, 100)
     assert.equal(trade.buyOrder.trader.username, 'trader1')
     assert.equal(trade.sellOrder.trader.username, 'trader2')
+  
+    market.clearAll('trader1', 'TW')
   }
 )
-test4.after(() => Clob.clearAll())
 test4.run()
 
 const test5 = suite('Acceptance test5')
 test5('A valid single order is able to sweep the book Given an empty orderbook for "TW"',
   () => {
-    Clob.post('trader1', 'TW', 'Buy', 9950, 100)
-    Clob.post('trader2', 'TW', 'Buy', 9945, 300)
-    Clob.post('trader3', 'TW', 'Buy', 9935, 500)
-    Clob.post('trader4', 'TW', 'Sell', 9930, 1000)
+    market.postOrder('trader1', 'TW', 'Buy', 9950, 100)
+    market.postOrder('trader2', 'TW', 'Buy', 9945, 300)
+    market.postOrder('trader3', 'TW', 'Buy', 9935, 500)
+    market.postOrder('trader4', 'TW', 'Sell', 9930, 1000)
 
-    let ob = Clob.getOrderHistory('TW')
+    let ob = market.getOrderHistory('trader1', 'TW')
     assert.equal(ob.length, 4)
 
     console.log(`\n\r${ob[0].trader.username}\t${ob[0].status}\t${ob[0].createdAt}\t${ob[0].limit}\t${ob[0].quantity}\t${ob[0].filledQuantity}`)
@@ -177,8 +180,9 @@ test5('A valid single order is able to sweep the book Given an empty orderbook f
     assert.equal(ob[3].quantity, 1000)
     assert.equal(ob[3].filledQuantity, 900)
     assert.equal(ob[3].status, 'Open')
+  
+    market.clearAll('trader1', 'TW')
   }
 )
-test5.after(() => Clob.clearAll())
 test5.run()
 
