@@ -34,9 +34,9 @@ interface IOrderBook {
   getBuySide(): string[]
   getSellSide(): string[]
   getOrderHistory(): IOrder[]
-  open(order: IOrder): void
+  open(order: IOrder): MarketResponse
   cancel (id: string): boolean 
-  match (order: IOrder): MarketResponse
+  clearAll(): void
 }
 
 interface IOrderBooks {

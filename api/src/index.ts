@@ -56,7 +56,7 @@ class Market implements IMarket {
       )
       orderBook.open(order)
 
-      let response = orderBook.match(order)
+      let response = orderBook.open(order)
       if (response.trade.price === 0) {
         log(`Market[${this.#name}].postOrder: No Trade for orderId: ${order.id}`)
       }

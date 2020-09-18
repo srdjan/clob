@@ -100,7 +100,7 @@ class OrderBook implements IOrderBook {
     AuditLog.push(order)
   }
 
-  open (order: IOrder): void {
+  open (order: IOrder): MarketResponse {
     if (order.side === 'Buy') {
       this.buys.set(order.id, order)
       let sorted = new Map([...this.buys].sort(_sortAscByLimit))
@@ -114,11 +114,10 @@ class OrderBook implements IOrderBook {
       log(`sorted sells: ${JSON.stringify(sorted.entries())}`)
       this.sells = sorted
     }
-
-    AuditLog.push(order)
+    return this.match(order)
   }
 
-  match (order: IOrder): MarketResponse {
+  private match (order: IOrder): MarketResponse {
     let trade = Trades.initializeTrade(order.ticker)
 
     let openOrders = this.getOpenOrders(order.trader, order.side)
@@ -176,7 +175,14 @@ class OrderBook implements IOrderBook {
       this.update(order)
       this.update(matchOrder)
     }
+
+    AuditLog.push(order)
     return { order, trade }
+  }
+
+  clearAll(): void {
+    this.buys.clear()
+    this.sells.clear()
   }
 }
 
