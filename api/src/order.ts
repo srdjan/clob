@@ -1,9 +1,8 @@
-import { IOrder, Ticker, Trader, Side, Status } from './model'
-import OrderId from './orderid'
+import { IOrder, Ticker, Trader, Side, Status, IOrderId } from './model'
 import { Money, Quantity, SeqGen, Timestamp } from './utils'
-import OrderHistory from './orderHistory'
 
 class Order implements IOrder {
+  static idSequence = 0
   id: string
   trader: Trader
   ticker: Ticker
@@ -13,6 +12,7 @@ class Order implements IOrder {
   filledQuantity: Quantity
   status: Status
   createdAt: Timestamp
+  lastChangedAt?: Timestamp
 
   constructor (
     trader: Trader,
@@ -21,7 +21,7 @@ class Order implements IOrder {
     limit: number,
     quantity: number
   ) {
-    this.id = OrderId.next(ticker, side)
+    this.id = Order.nextId(ticker, side)
     this.trader = trader
     this.ticker = ticker
     this.side = side
@@ -30,27 +30,34 @@ class Order implements IOrder {
     this.filledQuantity = 0
     this.status = 'Open'
     this.createdAt = SeqGen.next()
-
-    OrderHistory.push(this)
   }
 
-  cancel (): void {
-    this.status = 'Canceled'
-    OrderHistory.push(this)
+  static nextId (ticker: Ticker, side: Side): string {
+    let uid = Order.idSequence++
+    return `${ticker}.${side}.${uid}`
   }
 
-  update(): void {
-    OrderHistory.push(this)
+  static idFromString (id: string): IOrderId {
+    let idFields = id.split('.')
+    try {
+      return {
+        ticker: idFields[0] as Ticker,
+        side: idFields[1] as Side,
+        id: idFields[2] as string
+      }
+    } catch (e) {
+      throw new Error(`Order: Invalid id string format ${id}`)
+    }
   }
 
-  complete (): void {
-    this.status = 'Completed'
-    OrderHistory.push(this)
+  static idAsString (orderId: IOrderId): string {
+    return `${orderId.ticker}.${orderId.side}.${orderId.id}`
+  }
+  
+  static getEmptyOrder (): IOrder {
+    return new Order({ username: '', password: '' }, 'None', 'None', 0, 0)
   }
 }
 
-function getEmptyOrder (): IOrder {
-  return new Order({ username: '', password: '' }, 'None', 'None', 0, 0)
-}
 
-export { Order, getEmptyOrder }
+export { Order }

@@ -1,12 +1,12 @@
 import { IOrder } from './model'
 
-class OrderHistory {
+class AuditLog {
   static store = new Map<number, IOrder>()
-  static sequenceId = 0
+  static sequenceId: number = 0
 
   static push (order: IOrder): void {
-    this.store.set(this.sequenceId++, order)
+    AuditLog.store.set(AuditLog.sequenceId++, order)
   }
 }
 
-export default OrderHistory
+export { AuditLog }

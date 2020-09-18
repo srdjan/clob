@@ -1,6 +1,8 @@
 const uWS = require('uWebSockets.js')
-import * as Market from './index'
+import { Market } from './index'
 import { log } from './utils'
+
+const market = new Market("stock@clob")
 
 uWS
   .App()
@@ -15,32 +17,38 @@ uWS
         }
         case 'buy': {
           log(`Buy order for ${req.data.user} ${req.data.ticker}, limit: ${req.data.limit}`)
-          let result = Market.post(
+          let result = market.postOrder(
             req.data.user,
             req.data.ticker,
             req.data.side,
             req.data.limit,
             req.data.quantity
           )
-          //todo: need better error handling
-          //todo: get only Buy side (perf)
-          result = Market.getOrderBook(req.data.ticker)
-          ws.publish(`clob/${req.ticker}`, result)
+          let orderBook = market.getOrderBook(req.data.user, req.data.ticker)
+          if(!orderBook) {
+            ws.publish(`clob/${req.ticker}`, JSON.stringify({ Result: 'OrderBook not found' }))
+          }
+          else {
+            ws.publish(`clob/${req.ticker}`, result)
+          }
           break
         }
         case 'sell': {
           log(`Buy order for ${req.data.ticker}, limit: ${req.data.limit}`)
-          let result = Market.post(
+          let result = market.postOrder(
             req.data.user,
             req.data.ticker,
             req.data.side,
             req.data.limit,
             req.data.quantity
           )
-          //todo: need better error handling
-          //todo: get only SELL side (perf)
-          result = Market.getOrderBook(req.data.ticker)
-          ws.publish(`clob/${req.ticker}`, result)
+          let orderBook = market.getOrderBook(req.data.user, req.data.ticker)
+          if(!orderBook) {
+            ws.publish(`clob/${req.ticker}`, JSON.stringify({ Result: 'OrderBook not found' }))
+          }
+          else {
+            ws.publish(`clob/${req.ticker}`, result)
+          }
           break
         }
       }

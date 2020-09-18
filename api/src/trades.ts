@@ -1,5 +1,5 @@
 import { Trade, Ticker } from './model'
-import { getEmptyOrder } from './order'
+import { Order } from './order'
 
 class Trades {
   static idSequence = 0
@@ -10,8 +10,8 @@ class Trades {
       ticker: ticker,
       price: 0,
       quantity: 0,
-      buyOrder: getEmptyOrder(),
-      sellOrder: getEmptyOrder(),
+      buyOrder: Order.getEmptyOrder(),
+      sellOrder: Order.getEmptyOrder(),
       createdAt: Trades.idSequence++,
       message: 'None'
     }

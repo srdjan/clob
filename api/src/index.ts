@@ -1,72 +1,118 @@
 import { Order } from './order'
-import { Ticker, Side, IOrder } from './model'
-import * as OrderBooks from './orderbooks'
-import * as OrderBook from './engine'
+import { Ticker, Side, IOrder, IOrderBook, IOrderBooks, IMarket } from './model'
+import { OrderBooks } from './orderbooks'
 import * as Traders from './traders'
 import { log } from './utils'
 
-const find = (id: string): string => {
-  try {
-    return JSON.stringify(OrderBooks.get(id))
-  } catch (e) {
-    log(`Market.find: unexpected error, orderId: ${id}`)
+const orderBooks: IOrderBooks = new OrderBooks()
+
+class Market implements IMarket {
+  #name: string
+
+  constructor(name: string) {
+    this.#name = name
   }
-  return JSON.stringify({ Result: 'Unexpected Error' })
-}
 
-const post = (
-  username: string,
-  ticker: string,
-  side: string,
-  limit: number,
-  quantity: number
-): string => {
-  log(`USERNAME: ${username}`)
+  getOrder (userName: string, ticker: string, id: string): IOrder | undefined {
+    try {
+      Traders.verify(userName)
 
-  let trader = Traders.getOrCreate(username)
-  let order = new Order(trader, ticker as Ticker, side as Side, limit, quantity)
+      let orderBook = orderBooks.get(ticker as Ticker)
+      if (!orderBook) {
+        log(`Market[${this.#name}].find: OrderBook for ticker: ${ticker} not found`)
+        return undefined
+      }
 
-  try {
-    let response = OrderBook.match(order)
-    if (response.trade.price === 0) {
-      log(`Market.post: No Trade for orderId: ${order.id}`)
+      let order = orderBook.get(id)
+      if (!order) {
+        log(`Market[${this.#name}].find: Order for ticker; ${ticker} id: ${id} not found`)
+        return undefined
+      }
+      return order
+    } catch (e) {
+      log(`Market[${this.#name}].find: unexpected error, orderId: ${id}`)
     }
-    return JSON.stringify(response)
-  } catch (e) {
-    log(`Market.post: (1) unexpected error, order: ${order}, error: ${e}`)
+    return undefined
   }
-  return JSON.stringify({ result: 'Unexpected Error' })
-}
 
-const cancel = (userName: string, id: string): string => {
-  try {
+  postOrder (
+    username: string,
+    ticker: string,
+    side: string,
+    limit: number,
+    quantity: number
+  ): string {
+    try {
+      let trader = Traders.getOrCreate(username)
+
+      let orderBook = orderBooks.getOrCreate(ticker as Ticker)
+
+      let order = new Order(
+        trader,
+        ticker as Ticker,
+        side as Side,
+        limit,
+        quantity
+      )
+      orderBook.open(order)
+
+      let response = orderBook.match(order)
+      if (response.trade.price === 0) {
+        log(`Market[${this.#name}].postOrder: No Trade for orderId: ${order.id}`)
+      }
+      return JSON.stringify(response)
+    } catch (e) {
+      log(`Market[${this.#name}].postOrder: Unexpected error: ${e}`)
+    }
+    return JSON.stringify({ result: 'Unexpected Error!' })
+  }
+
+  cancelOrder (userName: string, ticker: Ticker, id: string): boolean {
+    try {
+      Traders.verify(userName)
+
+      let orderBook = orderBooks.get(ticker as Ticker)
+      if (!orderBook) {
+        log(`Market[${this.#name}].cancelOrder: Order for ticker: ${ticker} not found`)
+        return false
+      }
+
+      let result = orderBook.cancel(id)
+      if (!result) {
+        log(`Market[${this.#name}].cancelOrder: Order for id: ${id} not found`)
+        return false
+      }
+
+      log(`Market[${this.#name}].cancelOrder: Order with id: ${id} canceled`)
+      return true
+    } catch (e) {
+      log(`Market[${this.#name}].cancelOrder: Unexpected error, order: ${id}`)
+    }
+    return false
+  }
+
+  getOrderBook (userName: string, ticker: string): IOrderBook | undefined {
     Traders.verify(userName)
 
-    if (!OrderBooks.cancel(id)) {
-      throw new Error(`Market.cancel: Order for id: ${id} not found`)
+    let orderBook = orderBooks.get(ticker as Ticker)
+    if (!orderBook) {
+      log(`Market[${this.#name}].getOrderBook: OrderBook for ticker: ${ticker} not found`)
+      return undefined
     }
-    log(`Market.cancel: Order with id: ${id} canceled`)
-    return JSON.stringify({ Result: 'Success' })
-  } catch (e) {
-    log(`Market.cancel: Unexpected error, order: ${id}`)
+    return orderBook
   }
-  return JSON.stringify({ Result: 'Unexpected Error' })
+
+  getOrderHistory (userName: string, ticker: string): IOrder[] {
+    Traders.verify(userName)
+
+    let orderBook = orderBooks.get(ticker as Ticker)
+    if (!orderBook) {
+      log(`Market[${this.#name}].getOrderHistory: OrderBook for ticker: ${ticker} not found`)
+      return []
+    }
+
+    return orderBook.getOrderHistory()
+  }
 }
 
-function getOrderBook (ticker: string): string {
-  let orderBooks = OrderBooks.getOrderBook(ticker as Ticker)
-  let buys = orderBooks.buys.map(o => `${o.limit},${o.quantity}`)
-  let sells = orderBooks.sells.map(o => `${o.limit},${o.quantity}`)
-
-  return JSON.stringify({buys, sells})
-}
-
-function getOrderHistory (ticker: string): IOrder[] {
-  return Array.from(OrderBooks.getOrderHistory(ticker as Ticker))
-}
-
-function clearAll (): void {
-  OrderBooks.clearAll()
-}
-
-export { find, post, cancel, getOrderHistory, getOrderBook, clearAll }
+export { Market }
