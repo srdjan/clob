@@ -1,15 +1,13 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 import { Market } from '../../src/index'
-import { MarketResponse } from '../../src/model'
 
 const market = new Market('stock@clob')
 const log = console.log
 
 const test1 = suite('Acceptance test1')
-test1('A single valid order is accepted into the limit order book Given an empty orderbook for "TW"', () => {
-  let response = market.postOrder('trader1', 'TW', 'Buy', 9950, 100)
-  let result = JSON.parse(response) as MarketResponse
+test1.only('A single valid order is accepted into the limit order book Given an empty orderbook for "TW"', () => {
+  let result = market.postOrder('trader1', 'TW', 'Buy', 9950, 100)
   
   assert.equal(result.order.ticker, 'TW')
   assert.equal(result.order.trader.username, 'trader1')
@@ -19,10 +17,10 @@ test1.run()
 
 const test2 = suite('Acceptance test2')
 test2('Multiple valid orders are accepted into the limit order book Given an empty orderbook for "TW"', () => {
-  let response1 = market.postOrder('trader1', 'TW', 'Buy', 9950, 100)
-  let response2 = market.postOrder('trader2', 'TW', 'Sell', 9960, 200)
+  market.postOrder('trader1', 'TW', 'Buy', 9950, 100)
+  market.postOrder('trader2', 'TW', 'Sell', 9960, 200)
+  
   let orderBook = market.getOrderHistory('trader1', 'TW')
-  // console.log(`\n\ORDERBOOK: ${JSON.stringify(orderBook)}`)
   assert.equal(orderBook.length, 2)
 
   assert.equal(orderBook[0].ticker, 'TW')
@@ -79,13 +77,11 @@ test3('Two tradable orders result in a trade Given an empty orderbook for "TW"',
   assert.equal(orderBook[0].status, 'Completed')
   assert.equal(orderBook[1].status, 'Completed')
 
-  let parsedResponse2 = JSON.parse(response2)
-  // log(`\n\ntrade= ${JSON.stringify(parsedResponse2)}`)
-  assert.equal(parsedResponse2.trade.ticker, 'TW')
-  assert.equal(parsedResponse2.trade.price, 9950)
-  assert.equal(parsedResponse2.trade.quantity, 100)
-  assert.equal(parsedResponse2.trade.buyOrder.trader.username, 'trader1')
-  assert.equal(parsedResponse2.trade.sellOrder.trader.username, 'trader2')
+  assert.equal(response2.trade.ticker, 'TW')
+  assert.equal(response2.trade.price, 9950)
+  assert.equal(response2.trade.quantity, 100)
+  assert.equal(response2.trade.buyOrder.trader.username, 'trader1')
+  assert.equal(response2.trade.sellOrder.trader.username, 'trader2')
   
   market.clearAll('trader1', 'TW')
 })
@@ -121,12 +117,11 @@ test4('Two tradable orders with different quantities are partially filled Given 
     assert.equal(orderBook[0].status, 'Completed')
     assert.equal(orderBook[1].status, 'Open')
 
-    let { order, trade } = JSON.parse(response2)
-    assert.equal(trade.ticker, 'TW')
-    assert.equal(trade.price, 9950)
-    assert.equal(trade.quantity, 100)
-    assert.equal(trade.buyOrder.trader.username, 'trader1')
-    assert.equal(trade.sellOrder.trader.username, 'trader2')
+    assert.equal(response2.trade.ticker, 'TW')
+    assert.equal(response2.trade.price, 9950)
+    assert.equal(response2.trade.quantity, 100)
+    assert.equal(response2.trade.buyOrder.trader.username, 'trader1')
+    assert.equal(response2.trade.sellOrder.trader.username, 'trader2')
   
     market.clearAll('trader1', 'TW')
   }

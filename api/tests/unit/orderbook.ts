@@ -24,7 +24,7 @@ function newOrder (
 }
 
 const test1 = suite('Test OrderBook')
-test1('make first Buy Order', () => {
+test1('Post first Buy Order', () => {
   let orderBook = new OrderBook('TW')
   let response = orderBook.open(newOrder('joe', 'TW', 'Buy', 10, 100))
 
@@ -37,7 +37,7 @@ test1('make first Buy Order', () => {
 test1.run()
 
 const test2 = suite()
-test2('make first Sell Order', () => {
+test2('Post first Sell Order', () => {
   let orderBook = new OrderBook('TW')
   let response = orderBook.open(newOrder('joe', 'TW', 'Sell', 10, 100))
 
@@ -50,7 +50,7 @@ test2('make first Sell Order', () => {
 test2.run()
 
 const test3 = suite()
-test3('cancel order', () => {
+test3('Cancel order', () => {
   let orderBook = new OrderBook('TW')
 
   let buyResponse = orderBook.open(newOrder('joe', 'TW', 'Buy', 10, 100))
@@ -65,12 +65,19 @@ test4('Complete a full Buy trade', () => {
   let orderBook = new OrderBook('TW')
   
   let sellResponse = orderBook.open(newOrder('joe', 'TW', 'Sell', 10, 100))
+  let marketList = orderBook.getMarketList()
+  assert.equal(marketList.buys.length, 0)
+  assert.equal(marketList.sells.length, 1)
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 
   let buyResponse = orderBook.open(newOrder('sue', 'TW', 'Buy', 10, 100))
+  marketList = orderBook.getMarketList()
+  assert.equal(marketList.buys.length, 0)
+  assert.equal(marketList.sells.length, 0)
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
+
   orderBook.clearAll()
 })
 test4.run()
@@ -80,10 +87,16 @@ test5('Complete a full Sell trade', () => {
   let orderBook = new OrderBook('TW')
 
   let buyResponse = orderBook.open(newOrder('joe', 'TW', 'Buy', 10, 100))
+  let marketList = orderBook.getMarketList()
+  assert.equal(marketList.buys.length, 1)
+  assert.equal(marketList.sells.length, 0)
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
   let sellResponse = orderBook.open(newOrder('sue', 'TW', 'Sell', 10, 100))
+  marketList = orderBook.getMarketList()
+  assert.equal(marketList.buys.length, 0)
+  assert.equal(marketList.sells.length, 0)
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
   orderBook.clearAll()
@@ -100,6 +113,10 @@ test6('Complete a partial Buy trade', () => {
   assert.equal(sellResponse.order.status, 'Open')
 
   let buyResponse = orderBook.open(newOrder('sue', 'NET', 'Buy', 2000, 100))
+  let marketList = orderBook.getMarketList()
+  assert.equal(marketList.buys.length, 1)
+  assert.equal(marketList.sells.length, 0)
+
   assert.equal(buyResponse.order.limit, 2000)
   assert.equal(buyResponse.order.quantity, 100)
   assert.equal(buyResponse.order.filledQuantity, 10)
@@ -118,6 +135,10 @@ test7('Complete a partial Sell trade', () => {
   assert.equal(buyResponse.order.status, 'Open')
 
   let sellResponse = orderBook.open(newOrder('sue', 'T', 'Sell', 10, 100))
+  let marketList = orderBook.getMarketList()
+  assert.equal(marketList.buys.length, 0)
+  assert.equal(marketList.sells.length, 1)
+
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
   assert.equal(sellResponse.order.filledQuantity, 10)

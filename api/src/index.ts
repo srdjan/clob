@@ -1,7 +1,7 @@
 import { Order } from './order'
-import { Ticker, Side, IOrder, IOrderBook, IOrderBooks, IMarket } from './model'
+import { Ticker, Side, IOrder, IOrderBook, IOrderBooks, IMarket, MarketResponse, MarketList } from './model'
 import { OrderBooks } from './orderbooks'
-import * as Traders from './traders'
+import { Traders } from './traders'
 import { log } from './utils'
 
 const orderBooks: IOrderBooks = new OrderBooks()
@@ -41,7 +41,7 @@ class Market implements IMarket {
     side: string,
     limit: number,
     quantity: number
-  ): string {
+  ): MarketResponse {
     try {
       let trader = Traders.getOrCreate(username)
 
@@ -55,14 +55,12 @@ class Market implements IMarket {
         quantity
       )
       let response = orderBook.open(order)
-      if (response.trade.price === 0) {
-        log(`Market[${this.#name}].postOrder: No Trade for orderId: ${order.id}`)
-      }
-      return JSON.stringify(response)
+      log(`Market[${this.#name}].postOrder: ${response.message}`)
+      return response
     } catch (e) {
       log(`Market[${this.#name}].postOrder: Unexpected error: ${e}`)
     }
-    return JSON.stringify({ result: 'Unexpected Error!' })
+    throw new Error('Unexpected Error!')
   }
 
   cancelOrder (userName: string, ticker: Ticker, id: string): boolean {
@@ -112,6 +110,18 @@ class Market implements IMarket {
     return orderBook.getOrderHistory()
   }
 
+  getMarketList(userName: string, ticker: Ticker): MarketList {
+    Traders.verify(userName)
+
+    let orderBook = orderBooks.get(ticker as Ticker)
+    if (!orderBook) {
+      log(`Market[${this.#name}].getOrderHistory: OrderBook for ticker: ${ticker} not found`)
+      return {buys: [], sells: []}
+    }
+
+    return orderBook.getMarketList()
+  }
+  
   clearAll(userName: string, ticker: string) {
     Traders.verify(userName)
 

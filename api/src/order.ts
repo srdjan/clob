@@ -1,8 +1,10 @@
 import { IOrder, Ticker, Trader, Side, Status, IOrderId } from './model'
-import { Money, Quantity, SeqGen, Timestamp } from './utils'
+import { Money, Quantity, Timestamp } from './utils'
+
+let idSequence = 0
+let createdAtSequence = 0
 
 class Order implements IOrder {
-  static idSequence = 0
   id: string
   trader: Trader
   ticker: Ticker
@@ -21,7 +23,7 @@ class Order implements IOrder {
     limit: number,
     quantity: number
   ) {
-    this.id = Order.nextId(ticker, side)
+    this.id = `${ticker}.${side}.${idSequence++}`
     this.trader = trader
     this.ticker = ticker
     this.side = side
@@ -29,12 +31,15 @@ class Order implements IOrder {
     this.quantity = quantity
     this.filledQuantity = 0
     this.status = 'Open'
-    this.createdAt = SeqGen.next()
+    this.createdAt = createdAtSequence++
   }
 
-  static nextId (ticker: Ticker, side: Side): string {
-    let uid = Order.idSequence++
-    return `${ticker}.${side}.${uid}`
+  currentQuantity(): Quantity {
+    return this.quantity - this.filledQuantity
+  }
+
+  idAsString (): string {
+    return `${this.ticker}.${this.side}.${this.id}`
   }
 
   static idFromString (id: string): IOrderId {
@@ -49,15 +54,10 @@ class Order implements IOrder {
       throw new Error(`Order: Invalid id string format ${id}`)
     }
   }
-
-  static idAsString (orderId: IOrderId): string {
-    return `${orderId.ticker}.${orderId.side}.${orderId.id}`
-  }
   
-  static getEmptyOrder (): IOrder {
+  static getEmpty (): IOrder {
     return new Order({ username: '', password: '' }, 'None', 'None', 0, 0)
   }
 }
-
 
 export { Order }

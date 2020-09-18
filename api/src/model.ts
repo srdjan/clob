@@ -8,7 +8,6 @@ type Trader = {
   username: string
   password?: string
 }
-type Traders = Map<string, Trader>
 
 interface IOrderId {
   ticker: Ticker
@@ -27,13 +26,15 @@ interface IOrder {
   status: Status
   createdAt: Timestamp
   lastChangedAt?: Timestamp
+  currentQuantity(): Quantity
+  idAsString (): string 
 } 
 
 interface IOrderBook {
+  ticker: string
   get(id: string): IOrder | undefined
-  getBuySide(): string[]
-  getSellSide(): string[]
   getOrderHistory(): IOrder[]
+  getMarketList(): MarketList
   open(order: IOrder): MarketResponse
   cancel (id: string): boolean 
   clearAll(): void
@@ -55,17 +56,24 @@ type Trade = {
 }
 
 type MarketResponse = {
+  message: string
   order: IOrder
   trade: Trade
 }
 
+type MarketList = {
+  buys: Array<string>
+  sells: Array<string>
+}
+
 interface IMarket {
   getOrder(userName: string, ticker: string, id: string): IOrder | undefined
-  postOrder (username: string,ticker: string, side: string, limit: number, quantity: number): string
+  postOrder (username: string,ticker: string, side: string, limit: number, quantity: number): MarketResponse
   cancelOrder(userName: string, ticker: Ticker, id: string): boolean 
   getOrderHistory(userName: string, ticker: string): IOrder[] | undefined
   getOrderBook(userName: string, ticker: string): IOrderBook | undefined
+  getMarketList(userName: string, ticker: Ticker): MarketList
   clearAll(userName: string, ticker: string): void
 }
 
-export { Ticker, Side, Status, IOrder, IOrderId, IOrderBook, IOrderBooks, Trade, Traders, Trader, MarketResponse, IMarket }
+export { Ticker, Side, Status, IOrder, IOrderId, IOrderBook, IOrderBooks, Trade, Trader, MarketResponse, MarketList, IMarket }

@@ -2,15 +2,12 @@ import { Ticker, IOrderBook, IOrderBooks } from './model'
 import { OrderBook } from './orderbook'
 import { log } from './utils'
 
-class OrderBooks implements IOrderBooks {
-  #store: Map<Ticker, IOrderBook>
+let store = new Map<Ticker, IOrderBook>()
 
-  constructor() {
-    this.#store = new Map<Ticker, IOrderBook>()
-  }
+class OrderBooks implements IOrderBooks {
 
   get(ticker: Ticker): IOrderBook | undefined {
-    let orderbook =  this.#store.get(ticker)
+    let orderbook =  store.get(ticker)
     if(!orderbook) {
       log(`OrderBooks.get: Orderbook for ticcker: ${ticker} not found`)
       return undefined
@@ -19,10 +16,10 @@ class OrderBooks implements IOrderBooks {
   }
 
   getOrCreate(ticker: Ticker): IOrderBook {
-    let orderbook =  this.#store.get(ticker)
+    let orderbook =  store.get(ticker)
     if(!orderbook) {
       orderbook = new OrderBook(ticker)
-      this.#store.set(ticker, orderbook)
+      store.set(ticker, orderbook)
     }
     return orderbook
   }

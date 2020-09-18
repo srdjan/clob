@@ -1,6 +1,6 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
-import * as Traders from '../../src/traders'
+import { Traders } from '../../src/traders'
 
 const test = suite('Test Traders')
 

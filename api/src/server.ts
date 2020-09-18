@@ -2,7 +2,7 @@ const uWS = require('uWebSockets.js')
 import { Market } from './index'
 import { log } from './utils'
 
-const market = new Market("stock@clob")
+const market = new Market("stocks@clob")
 
 uWS
   .App()
@@ -17,38 +17,28 @@ uWS
         }
         case 'buy': {
           log(`Buy order for ${req.data.user} ${req.data.ticker}, limit: ${req.data.limit}`)
-          let result = market.postOrder(
+          market.postOrder(
             req.data.user,
             req.data.ticker,
             req.data.side,
             req.data.limit,
             req.data.quantity
           )
-          let orderBook = market.getOrderBook(req.data.user, req.data.ticker)
-          if(!orderBook) {
-            ws.publish(`clob/${req.ticker}`, JSON.stringify({ Result: 'OrderBook not found' }))
-          }
-          else {
-            ws.publish(`clob/${req.ticker}`, result)
-          }
+          let marketList = market.getMarketList(req.data.user, req.data.ticker)
+          ws.publish(`clob/${req.ticker}`, JSON.stringify(marketList))
           break
         }
         case 'sell': {
-          log(`Buy order for ${req.data.ticker}, limit: ${req.data.limit}`)
-          let result = market.postOrder(
+          log(`Sell order for ${req.data.ticker}, limit: ${req.data.limit}`)
+          market.postOrder(
             req.data.user,
             req.data.ticker,
             req.data.side,
             req.data.limit,
             req.data.quantity
           )
-          let orderBook = market.getOrderBook(req.data.user, req.data.ticker)
-          if(!orderBook) {
-            ws.publish(`clob/${req.ticker}`, JSON.stringify({ Result: 'OrderBook not found' }))
-          }
-          else {
-            ws.publish(`clob/${req.ticker}`, result)
-          }
+          let marketList = market.getMarketList(req.data.user, req.data.ticker)
+          ws.publish(`clob/${req.ticker}`, JSON.stringify(marketList))
           break
         }
       }
