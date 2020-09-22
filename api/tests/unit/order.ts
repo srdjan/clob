@@ -13,10 +13,10 @@ test('initialize empty order', () => {
 })
 
 test('initialize order', () => {
-  let order = new Order({username: 'trader1', password: 'ds2!'},'TW','Buy', 10, 10 )
+  let order = new Order({username: 'trader1', password: 'ds2!'},'TSLA','Buy', 10, 10 )
 
   assert.equal(order.trader.username, 'trader1')
-  assert.equal(order.ticker, 'TW')
+  assert.equal(order.ticker, 'TSLA')
   assert.equal(order.limit, 10)
 })
 

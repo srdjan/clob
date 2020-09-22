@@ -6,22 +6,22 @@ const test = suite('Test OrderBooks')
 
 test('getOrCreate', () => {
   let orderBooks = new OrderBooks()
-  let orderBook = orderBooks.getOrCreate('TW')
+  let orderBook = orderBooks.getOrCreate('TSLA')
 
-  assert.equal(orderBook.ticker, 'TW')
+  assert.equal(orderBook.ticker, 'TSLA')
 })
 
 test('get, success', () => {
   let orderBooks = new OrderBooks()
-  orderBooks.getOrCreate('TW')
-  let orderBook = orderBooks.get('TW')
+  orderBooks.getOrCreate('TSLA')
+  let orderBook = orderBooks.get('TSLA')
 
-  assert.equal(orderBook && orderBook.ticker, 'TW')
+  assert.equal(orderBook && orderBook.ticker, 'TSLA')
 })
 
 test('get, fail', () => {
   let orderBooks = new OrderBooks()
-  orderBooks.getOrCreate('TW')
+  orderBooks.getOrCreate('TSLA')
   let orderBook = orderBooks.get('NET')
 
   assert.equal(orderBook, undefined)

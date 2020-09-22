@@ -1,6 +1,6 @@
 import { Money, Quantity, Timestamp } from './utils'
 
-type Ticker = 'TW' | 'NET' | 'T' | 'None'
+type Ticker = 'TSLA' | 'NET' | 'SNAP' | 'None'
 type Side = 'Buy' | 'Sell' | 'None'
 type Status = 'Open' | 'Completed' | 'Canceled' | 'None'
 

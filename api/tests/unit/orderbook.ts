@@ -25,10 +25,10 @@ function newOrder (
 
 const test1 = suite('Test OrderBook')
 test1('Post first Buy Order', () => {
-  let orderBook = new OrderBook('TW')
-  let response = orderBook.open(newOrder('joe', 'TW', 'Buy', 10, 100))
+  let orderBook = new OrderBook('TSLA')
+  let response = orderBook.open(newOrder('joe', 'TSLA', 'Buy', 10, 100))
 
-  assert.equal(response.order.ticker, 'TW')
+  assert.equal(response.order.ticker, 'TSLA')
   assert.equal(response.order.side, 'Buy')
   assert.equal(response.order.limit, 10)
   assert.equal(response.order.quantity, 100)
@@ -38,10 +38,10 @@ test1.run()
 
 const test2 = suite()
 test2('Post first Sell Order', () => {
-  let orderBook = new OrderBook('TW')
-  let response = orderBook.open(newOrder('joe', 'TW', 'Sell', 10, 100))
+  let orderBook = new OrderBook('TSLA')
+  let response = orderBook.open(newOrder('joe', 'TSLA', 'Sell', 10, 100))
 
-  assert.equal(response.order.ticker, 'TW')
+  assert.equal(response.order.ticker, 'TSLA')
   assert.equal(response.order.side, 'Sell')
   assert.equal(response.order.limit, 10)
   assert.equal(response.order.quantity, 100)
@@ -51,9 +51,9 @@ test2.run()
 
 const test3 = suite()
 test3('Cancel order', () => {
-  let orderBook = new OrderBook('TW')
+  let orderBook = new OrderBook('TSLA')
 
-  let buyResponse = orderBook.open(newOrder('joe', 'TW', 'Buy', 10, 100))
+  let buyResponse = orderBook.open(newOrder('joe', 'TSLA', 'Buy', 10, 100))
   let canceledOrder = orderBook.cancel(buyResponse.order.id)
   assert.equal(canceledOrder, true)
   orderBook.clearAll()
@@ -62,16 +62,16 @@ test3.run()
 
 const test4 = suite()
 test4('Complete a full Buy trade', () => {
-  let orderBook = new OrderBook('TW')
+  let orderBook = new OrderBook('TSLA')
   
-  let sellResponse = orderBook.open(newOrder('joe', 'TW', 'Sell', 10, 100))
+  let sellResponse = orderBook.open(newOrder('joe', 'TSLA', 'Sell', 10, 100))
   let marketList = orderBook.getMarketList()
   assert.equal(marketList.buys.length, 0)
   assert.equal(marketList.sells.length, 1)
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 
-  let buyResponse = orderBook.open(newOrder('sue', 'TW', 'Buy', 10, 100))
+  let buyResponse = orderBook.open(newOrder('sue', 'TSLA', 'Buy', 10, 100))
   marketList = orderBook.getMarketList()
   assert.equal(marketList.buys.length, 0)
   assert.equal(marketList.sells.length, 0)
@@ -84,16 +84,16 @@ test4.run()
 
 const test5 = suite()
 test5('Complete a full Sell trade', () => {
-  let orderBook = new OrderBook('TW')
+  let orderBook = new OrderBook('TSLA')
 
-  let buyResponse = orderBook.open(newOrder('joe', 'TW', 'Buy', 10, 100))
+  let buyResponse = orderBook.open(newOrder('joe', 'TSLA', 'Buy', 10, 100))
   let marketList = orderBook.getMarketList()
   assert.equal(marketList.buys.length, 1)
   assert.equal(marketList.sells.length, 0)
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
-  let sellResponse = orderBook.open(newOrder('sue', 'TW', 'Sell', 10, 100))
+  let sellResponse = orderBook.open(newOrder('sue', 'TSLA', 'Sell', 10, 100))
   marketList = orderBook.getMarketList()
   assert.equal(marketList.buys.length, 0)
   assert.equal(marketList.sells.length, 0)
@@ -105,7 +105,7 @@ test5.run()
 
 const test6 = suite()
 test6('Complete a partial Buy trade', () => {
-  let orderBook = new OrderBook('TW')
+  let orderBook = new OrderBook('TSLA')
 
   let sellResponse = orderBook.open(newOrder('joe', 'NET', 'Sell', 2000, 90))
   assert.equal(sellResponse.order.limit, 2000)
@@ -127,14 +127,14 @@ test6.run()
 
 const test7 = suite()
 test7('Complete a partial Sell trade', () => {
-  let orderBook = new OrderBook('TW')
+  let orderBook = new OrderBook('TSLA')
   
-  let buyResponse = orderBook.open(newOrder('joe', 'T', 'Buy', 10, 90))
+  let buyResponse = orderBook.open(newOrder('joe', 'TSLA', 'Buy', 10, 90))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 90)
   assert.equal(buyResponse.order.status, 'Open')
 
-  let sellResponse = orderBook.open(newOrder('sue', 'T', 'Sell', 10, 100))
+  let sellResponse = orderBook.open(newOrder('sue', 'TSLA', 'Sell', 10, 100))
   let marketList = orderBook.getMarketList()
   assert.equal(marketList.buys.length, 0)
   assert.equal(marketList.sells.length, 1)
@@ -149,13 +149,13 @@ test7.run()
 
 const test8 = suite()
 test8('Fail a self trade', () => {
-  let orderBook = new OrderBook('TW')
+  let orderBook = new OrderBook('TSLA')
 
-  let buyResponse = orderBook.open(newOrder('joe', 'TW', 'Buy', 10, 100))
+  let buyResponse = orderBook.open(newOrder('joe', 'TSLA', 'Buy', 10, 100))
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
-  let sellResponse = orderBook.open(newOrder('joe', 'TW', 'Sell', 10, 100))
+  let sellResponse = orderBook.open(newOrder('joe', 'TSLA', 'Sell', 10, 100))
   log(`sellResponse: ${JSON.stringify(sellResponse)}`)
   assert.equal(sellResponse.trade.price, 0)
   orderBook.clearAll()
@@ -164,19 +164,19 @@ test8.run()
 
 const test9 = suite('multiple trades on one bid')
 test9('Complete a multiple matching trades on one Sell trade', () => {
-  let orderBook = new OrderBook('TW')
+  let orderBook = new OrderBook('TSLA')
 
-  orderBook.open(newOrder('trader1', 'TW', 'Buy', 9950, 100))
-  orderBook.open(newOrder('trader2', 'TW', 'Buy', 9945, 300))
-  orderBook.open(newOrder('trader3', 'TW', 'Buy', 9935, 500))
-  orderBook.open(newOrder('trader4', 'TW', 'Sell', 9930, 1000))
+  orderBook.open(newOrder('trader1', 'TSLA', 'Buy', 9950, 100))
+  orderBook.open(newOrder('trader2', 'TSLA', 'Buy', 9945, 300))
+  orderBook.open(newOrder('trader3', 'TSLA', 'Buy', 9935, 500))
+  orderBook.open(newOrder('trader4', 'TSLA', 'Sell', 9930, 1000))
 
   let ob = orderBook.getOrderHistory()
   assert.equal(ob.length, 4)
 
   showOrders(ob)
 
-  assert.equal(ob[0].ticker, 'TW')
+  assert.equal(ob[0].ticker, 'TSLA')
   assert.equal(ob[0].trader.username, 'trader1')
   assert.equal(ob[0].side, 'Buy')
   assert.equal(ob[0].limit, 9950)
@@ -184,7 +184,7 @@ test9('Complete a multiple matching trades on one Sell trade', () => {
   assert.equal(ob[0].filledQuantity, 100)
   assert.equal(ob[0].status, 'Completed')
 
-  assert.equal(ob[1].ticker, 'TW')
+  assert.equal(ob[1].ticker, 'TSLA')
   assert.equal(ob[1].trader.username, 'trader2')
   assert.equal(ob[1].side, 'Buy')
   assert.equal(ob[1].limit, 9945)
@@ -192,7 +192,7 @@ test9('Complete a multiple matching trades on one Sell trade', () => {
   assert.equal(ob[1].filledQuantity, 300)
   assert.equal(ob[1].status, 'Completed')
 
-  assert.equal(ob[2].ticker, 'TW')
+  assert.equal(ob[2].ticker, 'TSLA')
   assert.equal(ob[2].trader.username, 'trader3')
   assert.equal(ob[2].side, 'Buy')
   assert.equal(ob[2].limit, 9935)
@@ -200,7 +200,7 @@ test9('Complete a multiple matching trades on one Sell trade', () => {
   assert.equal(ob[2].filledQuantity, 500)
   assert.equal(ob[2].status, 'Completed')
 
-  assert.equal(ob[3].ticker, 'TW')
+  assert.equal(ob[3].ticker, 'TSLA')
   assert.equal(ob[3].trader.username, 'trader4')
   assert.equal(ob[3].side, 'Sell')
   assert.equal(ob[3].limit, 9930)
