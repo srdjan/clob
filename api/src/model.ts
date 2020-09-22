@@ -33,8 +33,8 @@ interface IOrder {
 interface IOrderBook {
   ticker: string
   get(id: string): IOrder | undefined
-  getOrderHistory(): IOrder[]
-  getMarketList(): MarketList
+  getHistory(): IOrder[]
+  getMarket(): MarketList
   open(order: IOrder): MarketResponse
   cancel (id: string): boolean 
   clearAll(): void

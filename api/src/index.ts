@@ -107,7 +107,7 @@ class Market implements IMarket {
       return []
     }
 
-    return orderBook.getOrderHistory()
+    return orderBook.getHistory()
   }
 
   getMarketList(userName: string, ticker: Ticker): MarketList {
@@ -119,7 +119,7 @@ class Market implements IMarket {
       return {buys: [], sells: []}
     }
 
-    return orderBook.getMarketList()
+    return orderBook.getMarket()
   }
   
   clearAll(userName: string, ticker: string) {

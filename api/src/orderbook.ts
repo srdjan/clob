@@ -3,7 +3,7 @@ import {
   IOrder,
   IOrderBook,
   MarketResponse,
-  MarketList
+  MarketList 
 } from './model'
 import { AuditLog } from './auditlog'
 import { Order } from './order'
@@ -39,7 +39,14 @@ class OrderBook implements IOrderBook {
     return order
   }
 
-  getMarketList (): MarketList {
+  getHistory (): IOrder[] {
+    let merged = Array.from(this.buys.values()).concat(
+      Array.from(this.sells.values())
+    )
+    let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
+    return sorted
+  }
+  getMarket (): MarketList {
     let openBuys = Array.from(this.buys.values()).filter(
       o => o.status === 'Open'
     )
@@ -51,14 +58,6 @@ class OrderBook implements IOrderBook {
       buys: Array.from(openBuys.values()).map(o => `${o.limit},${o.currentQuantity()}`),
       sells: Array.from(openSells.values()).map(o => `${o.limit},${o.currentQuantity()}`)
     }
-  }
-
-  getOrderHistory (): IOrder[] {
-    let merged = Array.from(this.buys.values()).concat(
-      Array.from(this.sells.values())
-    )
-    let sorted = merged.sort((a, b) => a.createdAt - b.createdAt)
-    return sorted
   }
 
   cancel (id: string): boolean {

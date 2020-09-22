@@ -65,14 +65,14 @@ test4('Complete a full Buy trade', () => {
   let orderBook = new OrderBook('TSLA')
   
   let sellResponse = orderBook.open(newOrder('joe', 'TSLA', 'Sell', 10, 100))
-  let marketList = orderBook.getMarketList()
+  let marketList = orderBook.getMarket()
   assert.equal(marketList.buys.length, 0)
   assert.equal(marketList.sells.length, 1)
   assert.equal(sellResponse.order.limit, 10)
   assert.equal(sellResponse.order.quantity, 100)
 
   let buyResponse = orderBook.open(newOrder('sue', 'TSLA', 'Buy', 10, 100))
-  marketList = orderBook.getMarketList()
+  marketList = orderBook.getMarket()
   assert.equal(marketList.buys.length, 0)
   assert.equal(marketList.sells.length, 0)
   assert.equal(buyResponse.order.limit, 10)
@@ -87,14 +87,14 @@ test5('Complete a full Sell trade', () => {
   let orderBook = new OrderBook('TSLA')
 
   let buyResponse = orderBook.open(newOrder('joe', 'TSLA', 'Buy', 10, 100))
-  let marketList = orderBook.getMarketList()
+  let marketList = orderBook.getMarket()
   assert.equal(marketList.buys.length, 1)
   assert.equal(marketList.sells.length, 0)
   assert.equal(buyResponse.order.limit, 10)
   assert.equal(buyResponse.order.quantity, 100)
 
   let sellResponse = orderBook.open(newOrder('sue', 'TSLA', 'Sell', 10, 100))
-  marketList = orderBook.getMarketList()
+  marketList = orderBook.getMarket()
   assert.equal(marketList.buys.length, 0)
   assert.equal(marketList.sells.length, 0)
   assert.equal(sellResponse.order.limit, 10)
@@ -113,7 +113,7 @@ test6('Complete a partial Buy trade', () => {
   assert.equal(sellResponse.order.status, 'Open')
 
   let buyResponse = orderBook.open(newOrder('sue', 'NET', 'Buy', 2000, 100))
-  let marketList = orderBook.getMarketList()
+  let marketList = orderBook.getMarket()
   assert.equal(marketList.buys.length, 1)
   assert.equal(marketList.sells.length, 0)
 
@@ -135,7 +135,7 @@ test7('Complete a partial Sell trade', () => {
   assert.equal(buyResponse.order.status, 'Open')
 
   let sellResponse = orderBook.open(newOrder('sue', 'TSLA', 'Sell', 10, 100))
-  let marketList = orderBook.getMarketList()
+  let marketList = orderBook.getMarket()
   assert.equal(marketList.buys.length, 0)
   assert.equal(marketList.sells.length, 1)
 
@@ -171,7 +171,7 @@ test9('Complete a multiple matching trades on one Sell trade', () => {
   orderBook.open(newOrder('trader3', 'TSLA', 'Buy', 9935, 500))
   orderBook.open(newOrder('trader4', 'TSLA', 'Sell', 9930, 1000))
 
-  let ob = orderBook.getOrderHistory()
+  let ob = orderBook.getHistory()
   assert.equal(ob.length, 4)
 
   showOrders(ob)
