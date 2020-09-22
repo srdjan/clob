@@ -13,7 +13,7 @@ class Market implements IMarket {
     this.#name = name
   }
 
-  getOrder (userName: string, ticker: string, id: string): IOrder | undefined {
+  get (userName: string, ticker: string, id: string): IOrder | undefined {
     try {
       Traders.verify(userName)
 
@@ -35,7 +35,7 @@ class Market implements IMarket {
     return undefined
   }
 
-  postOrder (
+  post (
     username: string,
     ticker: string,
     side: string,
@@ -63,7 +63,7 @@ class Market implements IMarket {
     throw new Error('Unexpected Error!')
   }
 
-  cancelOrder (userName: string, ticker: Ticker, id: string): boolean {
+  cancel (userName: string, ticker: Ticker, id: string): boolean {
     try {
       Traders.verify(userName)
 
@@ -87,18 +87,7 @@ class Market implements IMarket {
     return false
   }
 
-  getOrderBook (userName: string, ticker: string): IOrderBook | undefined {
-    Traders.verify(userName)
-
-    let orderBook = orderBooks.get(ticker as Ticker)
-    if (!orderBook) {
-      log(`Market[${this.#name}].getOrderBook: OrderBook for ticker: ${ticker} not found`)
-      return undefined
-    }
-    return orderBook
-  }
-
-  getOrderHistory (userName: string, ticker: string): IOrder[] {
+  getHistory (userName: string, ticker: string): IOrder[] {
     Traders.verify(userName)
 
     let orderBook = orderBooks.get(ticker as Ticker)
@@ -110,7 +99,7 @@ class Market implements IMarket {
     return orderBook.getHistory()
   }
 
-  getMarketList(userName: string, ticker: Ticker): MarketList {
+  getState(userName: string, ticker: Ticker): MarketList {
     Traders.verify(userName)
 
     let orderBook = orderBooks.get(ticker as Ticker)

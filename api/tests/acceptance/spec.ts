@@ -7,7 +7,7 @@ const log = console.log
 
 const test1 = suite('Acceptance test1')
 test1.only('A single valid order is accepted into the limit order book Given an empty orderbook for "TSLA"', () => {
-  let result = market.postOrder('trader1', 'TSLA', 'Buy', 9950, 100)
+  let result = market.post('trader1', 'TSLA', 'Buy', 9950, 100)
   
   assert.equal(result.order.ticker, 'TSLA')
   assert.equal(result.order.trader.username, 'trader1')
@@ -17,10 +17,10 @@ test1.run()
 
 const test2 = suite('Acceptance test2')
 test2('Multiple valid orders are accepted into the limit order book Given an empty orderbook for "TSLA"', () => {
-  market.postOrder('trader1', 'TSLA', 'Buy', 9950, 100)
-  market.postOrder('trader2', 'TSLA', 'Sell', 9960, 200)
+  market.post('trader1', 'TSLA', 'Buy', 9950, 100)
+  market.post('trader2', 'TSLA', 'Sell', 9960, 200)
   
-  let orderBook = market.getOrderHistory('trader1', 'TSLA')
+  let orderBook = market.getHistory('trader1', 'TSLA')
   assert.equal(orderBook.length, 2)
 
   assert.equal(orderBook[0].ticker, 'TSLA')
@@ -50,10 +50,10 @@ test2.run()
 
 const test3 = suite('Acceptance test3')
 test3('Two tradable orders result in a trade Given an empty orderbook for "TSLA"', () => {
-  let response1 = market.postOrder('trader1', 'TSLA', 'Buy', 9950, 100)
-  let response2 = market.postOrder('trader2', 'TSLA', 'Sell', 9950, 100)
+  let response1 = market.post('trader1', 'TSLA', 'Buy', 9950, 100)
+  let response2 = market.post('trader2', 'TSLA', 'Sell', 9950, 100)
 
-  let orderBook = market.getOrderHistory('trader1', 'TSLA')
+  let orderBook = market.getHistory('trader1', 'TSLA')
   assert.equal(orderBook.length, 2)
 
   assert.equal(orderBook[0].ticker, 'TSLA')
@@ -90,9 +90,9 @@ test3.run()
 const test4 = suite('Acceptance test4')
 test4('Two tradable orders with different quantities are partially filled Given an empty orderbook for "TSLA"',
   () => {
-    let response1 = market.postOrder('trader1', 'TSLA', 'Buy', 9950, 100)
-    let response2 = market.postOrder('trader2', 'TSLA', 'Sell', 9950, 300)
-    let orderBook = market.getOrderHistory('trader1', 'TSLA')
+    let response1 = market.post('trader1', 'TSLA', 'Buy', 9950, 100)
+    let response2 = market.post('trader2', 'TSLA', 'Sell', 9950, 300)
+    let orderBook = market.getHistory('trader1', 'TSLA')
 
     assert.equal(orderBook.length, 2)
 
@@ -131,12 +131,12 @@ test4.run()
 const test5 = suite('Acceptance test5')
 test5('A valid single order is able to sweep the book Given an empty orderbook for "TSLA"',
   () => {
-    market.postOrder('trader1', 'TSLA', 'Buy', 9950, 100)
-    market.postOrder('trader2', 'TSLA', 'Buy', 9945, 300)
-    market.postOrder('trader3', 'TSLA', 'Buy', 9935, 500)
-    market.postOrder('trader4', 'TSLA', 'Sell', 9930, 1000)
+    market.post('trader1', 'TSLA', 'Buy', 9950, 100)
+    market.post('trader2', 'TSLA', 'Buy', 9945, 300)
+    market.post('trader3', 'TSLA', 'Buy', 9935, 500)
+    market.post('trader4', 'TSLA', 'Sell', 9930, 1000)
 
-    let ob = market.getOrderHistory('trader1', 'TSLA')
+    let ob = market.getHistory('trader1', 'TSLA')
     assert.equal(ob.length, 4)
 
     console.log(`\n\r${ob[0].trader.username}\t${ob[0].status}\t${ob[0].createdAt}\t${ob[0].limit}\t${ob[0].quantity}\t${ob[0].filledQuantity}`)

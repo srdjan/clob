@@ -67,12 +67,11 @@ type MarketList = {
 }
 
 interface IMarket {
-  getOrder(userName: string, ticker: string, id: string): IOrder | undefined
-  postOrder (username: string,ticker: string, side: string, limit: number, quantity: number): MarketResponse
-  cancelOrder(userName: string, ticker: Ticker, id: string): boolean 
-  getOrderHistory(userName: string, ticker: string): IOrder[] | undefined
-  getOrderBook(userName: string, ticker: string): IOrderBook | undefined
-  getMarketList(userName: string, ticker: Ticker): MarketList
+  get (userName: string, ticker: string, id: string): IOrder | undefined
+  post (username: string,ticker: string, side: string, limit: number, quantity: number): MarketResponse
+  cancel (userName: string, ticker: Ticker, id: string): boolean 
+  getHistory(userName: string, ticker: string): IOrder[] | undefined
+  getState(userName: string, ticker: Ticker): MarketList
   clearAll(userName: string, ticker: string): void
 }
 

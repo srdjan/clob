@@ -17,28 +17,28 @@ uWS
         }
         case 'buy': {
           log(`Buy order for ${req.data.user} ${req.data.ticker}, limit: ${req.data.limit}`)
-          market.postOrder(
+          market.post(
             req.data.user,
             req.data.ticker,
             req.data.side,
             req.data.limit,
             req.data.quantity
           )
-          let marketList = market.getMarketList(req.data.user, req.data.ticker)
-          ws.publish(`clob/${req.ticker}`, JSON.stringify(marketList))
+          let marketState = market.getState(req.data.user, req.data.ticker)
+          ws.publish(`clob/${req.ticker}`, JSON.stringify(marketState))
           break
         }
         case 'sell': {
           log(`Sell order for ${req.data.ticker}, limit: ${req.data.limit}`)
-          market.postOrder(
+          market.post(
             req.data.user,
             req.data.ticker,
             req.data.side,
             req.data.limit,
             req.data.quantity
           )
-          let marketList = market.getMarketList(req.data.user, req.data.ticker)
-          ws.publish(`clob/${req.ticker}`, JSON.stringify(marketList))
+          let marketState = market.getState(req.data.user, req.data.ticker)
+          ws.publish(`clob/${req.ticker}`, JSON.stringify(marketState))
           break
         }
       }
