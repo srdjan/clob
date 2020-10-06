@@ -1,8 +1,9 @@
 const uWS = require('uWebSockets.js')
-import { Market } from './index'
-import { log } from './utils'
+import { Market } from '../../lib/src/index'
 
-const market = new Market("stocks@clob")
+const log = console.log
+
+const market = new Market('spacerocks')
 
 uWS
   .App()
@@ -16,7 +17,9 @@ uWS
           break
         }
         case 'buy': {
-          log(`Buy order for ${req.data.user} ${req.data.ticker}, limit: ${req.data.limit}`)
+          log(
+            `Buy order for ${req.data.user} ${req.data.ticker}, limit: ${req.data.limit}`
+          )
           market.post(
             req.data.user,
             req.data.ticker,

@@ -1,5 +1,5 @@
 import { Order } from './order'
-import { Ticker, Side, IOrder, IOrderBook, IOrderBooks, IMarket, MarketResponse, MarketList } from './model'
+import { Ticker, Side, IOrder, IOrderBooks, IMarket, MarketResponse, MarketList } from './model'
 import { OrderBooks } from './orderbooks'
 import { Traders } from './traders'
 import { log } from './utils'
