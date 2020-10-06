@@ -10,11 +10,11 @@
     "start": "ts-node src/index.ts"
   },
   "devDependencies": {
-    "@types/node": "^14.11.2",
+    "@types/node": "^14.11.5",
     "esm": "^3.2.25",
     "ts-node": "^9.0.0",
-    "typescript": "^4.0.2",
-    "uvu": "^0.3.3"
+    "typescript": "^4.0.3",
+    "uvu": "^0.3.4"
   },
   "dependencies": {
     "uwebsockets.js": "^18.3.3"
