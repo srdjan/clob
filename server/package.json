@@ -14,7 +14,8 @@
     "esm": "^3.2.25",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3",
-    "uvu": "^0.3.4"
+    "uvu": "^0.3.4",
+    "node-forge": ">=0.10.0"
   },
   "dependencies": {
     "uwebsockets.js": "^18.3.3"
