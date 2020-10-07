@@ -1,4 +1,4 @@
-# Toy Trading Aapplication
+# Toy Spacerocks Trading Application
 
 A full stack application, using React for the frontend and NodeJS for services, implements a simple trading marketplace
 for spacerocks! :)
